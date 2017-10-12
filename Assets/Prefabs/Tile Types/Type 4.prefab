@@ -169,7 +169,7 @@ GameObject:
   - component: {fileID: 114562394835445940}
   m_Layer: 0
   m_Name: Type 4
-  m_TagString: Untagged
+  m_TagString: Maze Tile
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -870,10 +870,10 @@ MeshCollider:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1573928974322970}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Convex: 0
+  m_Convex: 1
   m_InflateMesh: 0
   m_SkinWidth: 0.01
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
@@ -1024,31 +1024,6 @@ MonoBehaviour:
   _offset: {x: 0, y: 0}
   _itemScriptableObject: {fileID: 11400000, guid: 3c0c4ce9811477f4589f4107c7b953de,
     type: 2}
-  _compatibleUp: 
-  _compatibleRight: 
-  _compatibleDown: 
-  _compatibleLeft: 
-  _compatibleUpTypes: []
-  _compatibleRightTypes: []
-  _compatibleDownTypes: []
-  _compatibleLeftTypes: []
-  allTypes:
-  - {fileID: 1410405871155540, guid: 922f16306943ae041a6e7d79e269700f, type: 2}
-  - {fileID: 1552803741638160, guid: a3439ffd565f9e340914462a2f88ae58, type: 2}
-  - {fileID: 1729787659224180, guid: 1bb0e4affe241ef4887807d574b834a5, type: 2}
-  - {fileID: 1799395778083430, guid: 9b9130d7293c64f49ba92d3862c552d9, type: 2}
-  - {fileID: 1573928974322970}
-  - {fileID: 1557228528138056, guid: 1a0c81d3435cc6d429734100c93ec56e, type: 2}
-  - {fileID: 1502969408509874, guid: a59be8f5ac1c67d4fbec0a39c7e33eb2, type: 2}
-  - {fileID: 1855055009377148, guid: 558b1fa5e3e596c49a9f878a555d5388, type: 2}
-  - {fileID: 1109344489731070, guid: c23d9eaf6f319f943a5064e70d97b875, type: 2}
-  - {fileID: 1419688369258724, guid: 0e291a8f55796a44f9db76097dfa8b56, type: 2}
-  - {fileID: 1095316613278986, guid: 604e39b067d0c9441ada1a662d0a7db7, type: 2}
-  - {fileID: 1935444394483856, guid: 625a0a1b6e8b2864cba482d0590c656d, type: 2}
-  - {fileID: 1438217053889506, guid: fa63b1539213bae4282958f3de9dafba, type: 2}
-  - {fileID: 1426827667350260, guid: 42fb30bbf1550724db1e0b6fa7196feb, type: 2}
-  - {fileID: 1309418787082710, guid: eb191d405838259418de6b4b3a4ab523, type: 2}
-  - {fileID: 1350622175483620, guid: afbb60f77f1b9f149a547f26ac68b32a, type: 2}
   BlockedUp: 1
   BlockedRight: 1
   BlockedDown: 0

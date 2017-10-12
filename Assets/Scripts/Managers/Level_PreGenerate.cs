@@ -15,7 +15,35 @@ public class Level_PreGenerate : MonoBehaviour
     [SerializeField]
     private List<GameObject> _typesOfTiles;
 
+    [SerializeField]
     private List<GameObject> _spawnedTiles = new List<GameObject>();
+
+    [Button]
+    void ClearMap()
+    {
+        foreach (var tile in GameObject.FindGameObjectsWithTag("Maze Tile"))
+        {
+#if UNITY_EDITOR
+            DestroyImmediate(tile);
+#else
+            Destroy(tile);
+#endif
+
+        }
+        _spawnedTiles.Clear();
+    }
+
+    [Button]
+    void RevealMap()
+    {
+        foreach (var tile in _spawnedTiles)
+        {
+            foreach (var rend in tile.GetComponentsInChildren<Renderer>())
+            {
+                rend.enabled = true;
+            }
+        }
+    }
 
     [Button]
     void GenerateWithDelay()
@@ -36,19 +64,23 @@ public class Level_PreGenerate : MonoBehaviour
             // Create a list of possible directions to go based on which sides of the current tile is blocked
             Tile lastObjectTile = lastObject.GetComponent<Tile>();
             List<int> randomObjectList = new List<int>();
-            if (!lastObjectTile.BlockedUp && !Physics.CheckSphere(lastObject.transform.position + Vector3.forward * 3, .1f))
+
+            int layerMask = 1 << 8;
+            layerMask = ~layerMask;
+
+            if (!lastObjectTile.BlockedUp && !Physics.CheckSphere(lastObject.transform.position + Vector3.forward * 3, .1f, layerMask))
             {
                 randomObjectList.Add(0);
             }
-            if (!lastObjectTile.BlockedRight && !Physics.CheckSphere(lastObject.transform.position + Vector3.right * 3, .1f))
+            if (!lastObjectTile.BlockedRight && !Physics.CheckSphere(lastObject.transform.position + Vector3.right * 3, .1f, layerMask))
             {
                 randomObjectList.Add(1);
             }
-            if (!lastObjectTile.BlockedDown && !Physics.CheckSphere(lastObject.transform.position + Vector3.back * 3, .1f))
+            if (!lastObjectTile.BlockedDown && !Physics.CheckSphere(lastObject.transform.position + Vector3.back * 3, .1f, layerMask))
             {
                 randomObjectList.Add(2);
             }
-            if (!lastObjectTile.BlockedLeft && !Physics.CheckSphere(lastObject.transform.position + Vector3.left * 3, .1f))
+            if (!lastObjectTile.BlockedLeft && !Physics.CheckSphere(lastObject.transform.position + Vector3.left * 3, .1f, layerMask))
             {
                 randomObjectList.Add(3);
             }
@@ -146,16 +178,20 @@ public class Level_PreGenerate : MonoBehaviour
             // Create a list of possible directions to go based on which sides of the current tile is blocked
             Tile lastObjectTile = lastObject.GetComponent<Tile>();
             List<int> randomObjectList = new List<int>();
-            if (!lastObjectTile.BlockedUp && !Physics.CheckSphere(lastObject.transform.position + Vector3.forward * 3, .1f)) {
+
+            int layerMask = 1 << 8;
+            layerMask = ~layerMask;
+
+            if (!lastObjectTile.BlockedUp && !Physics.CheckSphere(lastObject.transform.position + Vector3.forward * 3, .1f, layerMask)) {
                 randomObjectList.Add(0);
             }
-            if (!lastObjectTile.BlockedRight && !Physics.CheckSphere(lastObject.transform.position + Vector3.right * 3, .1f)) {
+            if (!lastObjectTile.BlockedRight && !Physics.CheckSphere(lastObject.transform.position + Vector3.right * 3, .1f, layerMask)) {
                 randomObjectList.Add(1);
             }
-            if (!lastObjectTile.BlockedDown && !Physics.CheckSphere(lastObject.transform.position + Vector3.back * 3, .1f)) {
+            if (!lastObjectTile.BlockedDown && !Physics.CheckSphere(lastObject.transform.position + Vector3.back * 3, .1f, layerMask)) {
                 randomObjectList.Add(2);
             }
-            if (!lastObjectTile.BlockedLeft && !Physics.CheckSphere(lastObject.transform.position + Vector3.left * 3, .1f)) {
+            if (!lastObjectTile.BlockedLeft && !Physics.CheckSphere(lastObject.transform.position + Vector3.left * 3, .1f, layerMask)) {
                 randomObjectList.Add(3);
             }
 
@@ -204,7 +240,7 @@ public class Level_PreGenerate : MonoBehaviour
             }
 
             // Pick a tile from the remaining possible tiles
-            print("Direction: " + direction);
+            // print("Direction: " + direction);
             GameObject chosenTile = possibleTiles[Random.Range(0, possibleTiles.Count)];
 
             // Spawn the chosen tile
@@ -236,12 +272,6 @@ public class Level_PreGenerate : MonoBehaviour
     {
         position.y = 0;
         Vector3 newPos = position + direction * 3;
-
-        // There is already a tile here
-        if (Physics.CheckSphere(newPos, .1f))
-        {
-            return null;
-        }
         return Instantiate(chosenTile, newPos, Quaternion.identity);
     }
 }

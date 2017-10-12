@@ -6,10 +6,14 @@ using UnityEngine;
 [RequireComponent(typeof(HumanMotor))]
 public class PlayerInput : MonoBehaviour
 {
-	private Camera _camera;
-	private HumanMotor _motor;
+    [SerializeField]
+    private float _MovementDebounce;
 
-	void Start ()
+    private Camera _camera;
+	private HumanMotor _motor;
+    private float _lastTime = 0;
+
+    void Start ()
 	{
 		_camera = Camera.main;
 		_motor = GetComponent<HumanMotor>();
@@ -17,9 +21,10 @@ public class PlayerInput : MonoBehaviour
 	
 	void Update ()
 	{
-		if (Input.GetMouseButton(0))
+		if (Input.GetMouseButton(0) && Time.time > _lastTime + _MovementDebounce)
 		{
-			OnMouseClick();
+            OnMouseClick();
+		    _lastTime = Time.time;
 		}	
 	}
 
