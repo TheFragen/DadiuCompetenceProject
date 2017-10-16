@@ -1,44 +1,61 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using EasyButtons;
-using Gamelogic.Extensions;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
+#pragma warning disable 649
 public class Tile : MonoBehaviour
 {
-	[SerializeField]
-	private int _gridSize;
-	[SerializeField]
-	private Vector2 _offset;
-
-	[SerializeField]
-	private Items _itemScriptableObject;
-
     public bool BlockedUp = false;
     public bool BlockedRight = false;
     public bool BlockedDown = false;
     public bool BlockedLeft = false;
 
+    [SerializeField]
+	private int _gridSize;
+    [SerializeField]
+	private Items _itemScriptableObject;
+
+    private List<Vector3> _itemSpawnPositions;
+    private Grid _Grid;
+
     void Start()
-	{
-		List<Vector3> itemSpawnPositions = GetSpawnPositions();
+    {
+        _Grid = GameObject.FindGameObjectWithTag("Generator").GetComponent<Grid>();
+
+		_itemSpawnPositions = GetTilePositions();
 
 		int numItemsToSpawn = Random.Range(0, 9);
 		for (int i = 0; i < numItemsToSpawn; i++)
 		{
-			SpawnObjects(ref itemSpawnPositions);
+			SpawnObjects(ref _itemSpawnPositions);
         }
 	    if (gameObject.tag != "Respawn")
 	    {
 	        foreach (var rend in gameObject
 	            .GetComponentsInChildren<Renderer>())
 	        {
-	            rend.enabled = false;
+	         //   rend.enabled = false;
 	        }
 	    }	    
     }
 
-	List<Vector3> GetSpawnPositions()
+    private void OnDrawGizmos()
+    {
+        if (_itemSpawnPositions == null)
+        {
+            return;
+        }
+        foreach (var node in _itemSpawnPositions)
+        {
+            if (!_Grid._pathFinding.IsInGrid(node))
+            {
+                Gizmos.DrawCube(node, Vector3.one * (_itemScriptableObject._nodeDiameter - .1f));
+            }
+        }
+    }
+
+
+
+    List<Vector3> GetTilePositions()
 	{
 		List<Vector3> spawnPositions = new List<Vector3>();
 		Renderer rend = GetComponent<Renderer>();
@@ -53,15 +70,17 @@ public class Tile : MonoBehaviour
 			for (int x = 0; x < _gridSize; x++)
 			{
 				Vector3 pos = transform.position;
-				pos.x = pos.x - width / 2 + x * xSpacing;
-				pos.z = pos.z - height / 2 + y * ySpacing;
+				pos.x = pos.x - width / 2 + x * xSpacing + xSpacing/2;
+				pos.z = pos.z - height / 2 + y * ySpacing + ySpacing/2;
+                
+			    _Grid.AddToGrid(pos);
 				spawnPositions.Add(pos);
 			}
 		}
 		return spawnPositions;
 	}
 
-	void SpawnObjects(ref List<Vector3> posibleLocations)
+    void SpawnObjects(ref List<Vector3> posibleLocations)
 	{
 		List<Item> possibleItems = _itemScriptableObject._itemList;
 		int randomIndex = Random.Range(0, possibleItems.Count);

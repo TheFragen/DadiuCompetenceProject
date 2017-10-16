@@ -10,4 +10,6 @@ public class Items : ScriptableObject
 	         " 0 is items will never spawn, 100 is items will always spawn"),
 	 Range(0, 100)]
 	public int _spawnRate;
+
+    public float _nodeDiameter;
 }

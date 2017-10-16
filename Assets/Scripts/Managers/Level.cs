@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Gamelogic.Extensions.Algorithms;
 using UnityEngine;
-#pragma warning disable 649
 
+#pragma warning disable 649
 public class Level : MonoBehaviour
 {
 	[SerializeField]

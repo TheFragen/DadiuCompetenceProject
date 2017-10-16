@@ -17,3 +17,4 @@ MonoBehaviour:
       type: 2}
     isArtefact: 0
   _spawnRate: 8
+  _nodeDiameter: 0.9

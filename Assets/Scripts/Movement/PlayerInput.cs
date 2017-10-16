@@ -1,13 +1,16 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Gamelogic.Extensions;
 using UnityEngine;
 
+#pragma warning disable 649
 [RequireComponent(typeof(HumanMotor))]
 public class PlayerInput : MonoBehaviour
 {
     [SerializeField]
     private float _MovementDebounce;
+
+    [SerializeField]
+    private Grid _Grid;
 
     private Camera _camera;
 	private HumanMotor _motor;
@@ -25,7 +28,14 @@ public class PlayerInput : MonoBehaviour
 		{
             OnMouseClick();
 		    _lastTime = Time.time;
-		}	
+		}
+/*
+	    Node n = _Grid.WorldPosToNode(transform.position);
+	    if (n != null)
+	    {
+	        _Grid.GetNeighbours(n);
+        }
+	    */
 	}
 
 	void OnMouseClick()
