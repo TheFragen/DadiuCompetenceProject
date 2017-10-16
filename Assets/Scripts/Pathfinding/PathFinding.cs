@@ -1,29 +1,69 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using EasyButtons;
 using UnityEngine;
 
 public class PathFinding : MonoBehaviour
 {
-    [SerializeField] private Grid _Grid;
+    [SerializeField]
+    private Grid _Grid;
 
-    [SerializeField] private Transform _Start, _Target;
+    [SerializeField]
+    private Transform _Start, _Target;
 
-    [SerializeField] private Items _itemScriptableObject;
+    [SerializeField]
+    private Items _itemScriptableObject;
+
+    [SerializeField]
+    private float _WaitTime = .5f;
+    [SerializeField]
+    private bool _useDelay = false;
+
+    [SerializeField]
+    private bool _EveryFrame = false;
 
     private List<Node> _Path;
+    private bool _coroutineRunning = false;
+    private Vector3 _lastFramePos = Vector3.zero;
+
+    private Vector3 _workingNode, _pivotNode;
 
     public bool IsInGrid(Vector3 nodePos) {
         if (_Path == null) return false;
         return _Path.Contains(_Grid.WorldPosToNode(nodePos));
     }
 
+    void Update()
+    {
+        if (_EveryFrame && _Target.transform.position != _lastFramePos)
+        {
+            StartCoroutine(FindPathCoroutine(0));
+            _lastFramePos = _Target.transform.position;
+        }
+    }
+
     [Button]
     void FindPath()
     {
+        if (_useDelay)
+        {
+            StartCoroutine(FindPathCoroutine(_WaitTime));
+        }
+        else
+        {
+            StartCoroutine(FindPathCoroutine(0));
+        }
+    }
+    
+    IEnumerator FindPathCoroutine(float WaitTime)
+    {
+        float startTime = Time.realtimeSinceStartup;
+
         if (_Start == null || _Target == null)
         {
             Debug.LogError("Start or target is null");
-            return;
+            yield return null;
         }
         List<Node> open = new List<Node>();
         HashSet<Node> closed = new HashSet<Node>();
@@ -45,12 +85,13 @@ public class PathFinding : MonoBehaviour
             enabled = false;
         }
 
+        _coroutineRunning = true;
         open.Add(startNode);
 
-        int runs = 0;
+     //   int runs = 0;
         while (open.Count > 0)
         {
-            print(runs++);
+         //   print(runs++);
             Node currentNode = open[0];
             // Find lowest fCost node in open
             foreach (var n in open)
@@ -69,10 +110,14 @@ public class PathFinding : MonoBehaviour
             // Return if a path is found
             if (currentNode == targetNode)
             {
-                print("Found the path dude");
+                //print("Found the path dude");
                 Retrace(startNode, targetNode);
-                return;
+              //  print("Time of execution: " +(Time.realtimeSinceStartup - startTime));
+                _coroutineRunning = false;
+                yield return null;
             }
+
+            _pivotNode = currentNode._WorldPos;
 
             foreach (var neighbour in _Grid.GetNeighbours(currentNode))
             {
@@ -81,19 +126,17 @@ public class PathFinding : MonoBehaviour
                     continue;
                 }
 
-                Vector3 dirVector = currentNode._WorldPos - neighbour._WorldPos;
-                int newCost = currentNode._GCost +
-                              Mathf.RoundToInt(Vector3.SqrMagnitude(dirVector));
+                _workingNode = neighbour._WorldPos;
+
+                int newCost = currentNode._GCost + ManhattenDistanceInt(currentNode, neighbour);
                 if (newCost < neighbour._GCost || !open.Contains(neighbour))
                 {
                     // Distance to startNode through parent
                     neighbour._GCost = newCost;
 
                     // Distance to target
-                    Vector3 dirVector2 =
-                        neighbour._WorldPos - targetNode._WorldPos;
                     neighbour._HCost =
-                        Mathf.RoundToInt(Vector3.SqrMagnitude(dirVector2));
+                        ManhattenDistanceInt(neighbour, targetNode);
 
                     neighbour._parentNode = currentNode;
 
@@ -101,6 +144,11 @@ public class PathFinding : MonoBehaviour
                     {
                         open.Add(neighbour);
                     }
+                }
+
+                if((int)WaitTime > 0)
+                {
+                    yield return new WaitForSeconds(WaitTime);
                 }
             }
         }
@@ -134,6 +182,19 @@ public class PathFinding : MonoBehaviour
         */
     }
 
+    float ManhattenDistance(Node s, Node e)
+    {
+        float D = 1;
+        float dx = Mathf.Abs(s._WorldPos.x - e._WorldPos.x);
+        float dy = Mathf.Abs(s._WorldPos.y - e._WorldPos.y);
+        return D * (dx + dy);
+    }
+
+    int ManhattenDistanceInt(Node s, Node e)
+    {
+        return Mathf.RoundToInt(ManhattenDistance(s, e));
+    }
+
     void Retrace(Node startNode, Node targetNode)
     {
         // Get's the parents between target and start, and saves it to the _Path list
@@ -151,6 +212,11 @@ public class PathFinding : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawCube(_workingNode + Vector3.up, Vector3.one * (_itemScriptableObject._nodeDiameter - .1f));
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawCube(_pivotNode + Vector3.up, Vector3.one * (_itemScriptableObject._nodeDiameter - .1f));
+
         if (_Path == null || _Path.Count == 0)
         {
             return;

@@ -8,8 +8,8 @@ public class Grid : MonoBehaviour
 
     private Dictionary<Vector3, Node> _Grid;
     private Vector3 _testPos;
-    
-    private void Start()
+
+    private void Awake()
     {
         _Grid = new Dictionary<Vector3, Node>();
     }
@@ -23,72 +23,42 @@ public class Grid : MonoBehaviour
 
         // North
         Node north;
-        _Grid.TryGetValue(node._WorldPos + Vector3.back, out north);
-        if (north != null)
+        _Grid.TryGetValue(node._WorldPos + Vector3.forward, out north);
+        if (north != null &&
+            !Physics.CheckSphere(node._WorldPos + new Vector3(0, .5f, .5f), .1f,
+                layerMask))
         {
-            // Raycast this direction to see if there is a wall
-            RaycastHit hit;
-            Vector3 direction = node._WorldPos - north._WorldPos;
-            Physics.Raycast(node._WorldPos, direction, out hit,
-                direction.magnitude + .25f, layerMask);
-
-            print("North: " + Physics.CheckSphere(north._WorldPos + new Vector3(0, 0, .5f), .1f));
-
-            if (hit.transform == null || hit.transform.name != "Wall")
-            {
-                neighbours.Add(north);
-            }
+            neighbours.Add(north);
         }
 
         // East
         Node east;
         _Grid.TryGetValue(node._WorldPos + Vector3.right, out east);
-        if (east != null)
+        if (east != null &&
+            !Physics.CheckSphere(node._WorldPos + new Vector3(.5f, .5f, 0), .1f,
+                layerMask))
         {
-            // Raycast this direction to see if there is a wall
-            RaycastHit hit;
-            Vector3 direction = node._WorldPos - east._WorldPos;
-            Physics.Raycast(node._WorldPos, direction, out hit,
-                direction.magnitude + .25f, layerMask);
-
-            if (hit.transform == null || hit.transform.name != "Wall")
-            {
-                neighbours.Add(east);
-            }
+            neighbours.Add(east);
         }
 
         // South
         Node south;
-        _Grid.TryGetValue(node._WorldPos + Vector3.forward, out south);
-        if (south != null)
+        _Grid.TryGetValue(node._WorldPos + Vector3.back, out south);
+        if (south != null &&
+            !Physics.CheckSphere(node._WorldPos + new Vector3(0, .5f, -.5f),
+                .1f, layerMask))
         {
-            // Raycast this direction to see if there is a wall
-            RaycastHit hit;
-            Vector3 direction = node._WorldPos - south._WorldPos;
-            Physics.Raycast(node._WorldPos, direction, out hit,
-                direction.magnitude + .25f, layerMask);
-
-            if (hit.transform == null || hit.transform.name != "Wall")
-            {
-                neighbours.Add(south);
-            }
+            neighbours.Add(south);
         }
 
         // West
         Node west;
         _Grid.TryGetValue(node._WorldPos + Vector3.left, out west);
-        if (west != null)
+        if (west != null &&
+            !Physics.CheckSphere(node._WorldPos + new Vector3(-.5f, .5f, 0),
+                .1f, layerMask))
         {
-            // Raycast this direction to see if there is a wall
-            RaycastHit hit;
-            Vector3 direction = node._WorldPos - west._WorldPos;
-            Physics.Raycast(node._WorldPos, direction, out hit,
-                direction.magnitude + .25f, layerMask);
-
-            if (hit.transform == null || hit.transform.name != "Wall")
-            {
-                neighbours.Add(west);
-            }
+            neighbours.Add(west);
         }
 
         return neighbours;
@@ -134,7 +104,6 @@ public class Grid : MonoBehaviour
         normalizedPos.z = Mathf.Round(normalizedPos.z);
 
         Vector3 nodePos = tilePos + normalizedPos;
-        _testPos = nodePos;
 
         Node n;
         _Grid.TryGetValue(nodePos, out n);
@@ -146,8 +115,8 @@ public class Grid : MonoBehaviour
     {
         if (_testPos != Vector3.zero)
         {
-            Gizmos.color = Color.blue;
-            Gizmos.DrawSphere(_testPos, .5f);
+            Gizmos.color = Color.magenta;
+            Gizmos.DrawSphere(_testPos, .1f);
         }
     }
 }

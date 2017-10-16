@@ -142,6 +142,9 @@ MonoBehaviour:
   _Target: {fileID: 173790454}
   _itemScriptableObject: {fileID: 11400000, guid: 3c0c4ce9811477f4589f4107c7b953de,
     type: 2}
+  _WaitTime: 0.5
+  _useDelay: 0
+  _EveryFrame: 0
 --- !u!4 &1524510
 Transform:
   m_ObjectHideFlags: 0
@@ -429,7 +432,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
 --- !u!1 &355126679
 GameObject:
@@ -1106,7 +1109,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4245112958391560, guid: 55abd98e82b707649a31dff30b2c70a0, type: 2}
       propertyPath: m_RootOrder
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 1171659700074062, guid: 55abd98e82b707649a31dff30b2c70a0, type: 2}
       propertyPath: m_Name
@@ -1261,7 +1264,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &965761988
 MonoBehaviour:
@@ -1412,7 +1415,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &991697361
 GameObject:
@@ -2107,7 +2110,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 65, y: 0, z: 0}
 --- !u!114 &1431250228
 MonoBehaviour:
@@ -2600,7 +2603,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1847434350
 MonoBehaviour:
@@ -2614,7 +2617,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _spawningObject: {fileID: 764606000}
-  _numTilesToSpawn: 10
+  _numTilesToSpawn: 1000
   _typesOfTiles:
   - {fileID: 1410405871155540, guid: 922f16306943ae041a6e7d79e269700f, type: 2}
   - {fileID: 1552803741638160, guid: a3439ffd565f9e340914462a2f88ae58, type: 2}

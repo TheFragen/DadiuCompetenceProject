@@ -29,13 +29,13 @@ public class PlayerInput : MonoBehaviour
             OnMouseClick();
 		    _lastTime = Time.time;
 		}
-/*
+
 	    Node n = _Grid.WorldPosToNode(transform.position);
 	    if (n != null)
 	    {
 	        _Grid.GetNeighbours(n);
         }
-	    */
+	    
 	}
 
 	void OnMouseClick()
