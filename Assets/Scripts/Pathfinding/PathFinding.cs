@@ -10,9 +10,6 @@ public class PathFinding : MonoBehaviour
     private Grid _Grid;
 
     [SerializeField]
-    private Transform _Start, _Target;
-
-    [SerializeField]
     private Items _itemScriptableObject;
 
     [SerializeField]
@@ -23,24 +20,109 @@ public class PathFinding : MonoBehaviour
     [SerializeField]
     private bool _EveryFrame = false;
 
-    private List<Node> _Path;
     private bool _coroutineRunning = false;
     private Vector3 _lastFramePos = Vector3.zero;
 
-    private Vector3 _workingNode, _pivotNode;
-
     public bool IsInGrid(Vector3 nodePos) {
-        if (_Path == null) return false;
-        return _Path.Contains(_Grid.WorldPosToNode(nodePos));
+    //    if (_Path == null) return false;
+    //    return _Path.Contains(_Grid.WorldPosToNode(nodePos));
+        return false;
     }
 
     void Update()
     {
-        if (_EveryFrame && _Target.transform.position != _lastFramePos)
+     /*   if (_EveryFrame && (_Target.transform.position - _lastFramePos).magnitude > 1)
         {
             StartCoroutine(FindPathCoroutine(0));
             _lastFramePos = _Target.transform.position;
+        }*/
+    }
+
+    public List<Node> GeneratePath(Transform start, Transform target)
+    {
+        List<Node> path = new List<Node>();
+
+        float startTime = Time.realtimeSinceStartup;
+
+        if (start == null || target == null) {
+            Debug.LogError("Start or target is null");
+            return null;
         }
+
+        if (!Level_PreGenerate.Instance._LevelIsGenerated)
+        {
+            Debug.LogError("No level generated yet");
+            return null;
+        }
+        List<Node> open = new List<Node>();
+        HashSet<Node> closed = new HashSet<Node>();
+
+
+        Node startNode = _Grid.WorldPosToNode(start.position);
+        Node targetNode = _Grid.WorldPosToNode(target.position);
+
+        if (startNode == null) {
+            Debug.LogError("StartNode is null");
+        }
+        if (targetNode == null) {
+            Debug.LogError("TargetNode is null");
+        }
+        if (startNode == null && targetNode == null) {
+            enabled = false;
+        }
+
+        _coroutineRunning = true;
+        open.Add(startNode);
+
+        //   int runs = 0;
+        while (open.Count > 0) {
+            //   print(runs++);
+            Node currentNode = open[0];
+            // Find lowest fCost node in open
+            foreach (var n in open) {
+                if (n.FCost() <= currentNode.FCost() &&
+                    n._HCost < currentNode._HCost) {
+                    currentNode = n;
+                }
+            }
+
+            // Remove current from open
+            open.Remove(currentNode);
+            closed.Add(currentNode);
+
+            // Return if a path is found
+            if (currentNode == targetNode) {
+                //print("Found the path dude");
+                path = Retrace(startNode, targetNode);
+                print("<color=green>Pathfinding:</color> Time of execution: " + (Time.realtimeSinceStartup - startTime));
+                _coroutineRunning = false;
+                return path;
+            }
+
+            foreach (var neighbour in _Grid.GetNeighbours(currentNode)) {
+                if (!neighbour._Walkable || closed.Contains(neighbour)) {
+                    continue;
+                }
+
+                int newCost = currentNode._GCost + ManhattenDistanceInt(currentNode, neighbour);
+                if (newCost < neighbour._GCost || !open.Contains(neighbour)) {
+                    // Distance to startNode through parent
+                    neighbour._GCost = newCost;
+
+                    // Distance to target
+                    neighbour._HCost =
+                        ManhattenDistanceInt(neighbour, targetNode);
+
+                    neighbour._parentNode = currentNode;
+
+                    if (!open.Contains(neighbour)) {
+                        open.Add(neighbour);
+                    }
+                }
+            }
+        }
+
+        return path;
     }
 
     [Button]
@@ -58,100 +140,7 @@ public class PathFinding : MonoBehaviour
     
     IEnumerator FindPathCoroutine(float WaitTime)
     {
-        float startTime = Time.realtimeSinceStartup;
-
-        if (_Start == null || _Target == null)
-        {
-            Debug.LogError("Start or target is null");
-            yield return null;
-        }
-        List<Node> open = new List<Node>();
-        HashSet<Node> closed = new HashSet<Node>();
-
-
-        Node startNode = _Grid.WorldPosToNode(_Start.position);
-        Node targetNode = _Grid.WorldPosToNode(_Target.position);
-
-        if (startNode == null)
-        {
-            Debug.LogError("StartNode is null");
-        }
-        if (targetNode == null)
-        {
-            Debug.LogError("TargetNode is null");
-        }
-        if (startNode == null && targetNode == null)
-        {
-            enabled = false;
-        }
-
-        _coroutineRunning = true;
-        open.Add(startNode);
-
-     //   int runs = 0;
-        while (open.Count > 0)
-        {
-         //   print(runs++);
-            Node currentNode = open[0];
-            // Find lowest fCost node in open
-            foreach (var n in open)
-            {
-                if (n.FCost() <= currentNode.FCost() &&
-                    n._HCost < currentNode._HCost)
-                {
-                    currentNode = n;
-                }
-            }
-
-            // Remove current from open
-            open.Remove(currentNode);
-            closed.Add(currentNode);
-
-            // Return if a path is found
-            if (currentNode == targetNode)
-            {
-                //print("Found the path dude");
-                Retrace(startNode, targetNode);
-              //  print("Time of execution: " +(Time.realtimeSinceStartup - startTime));
-                _coroutineRunning = false;
-                yield return null;
-            }
-
-            _pivotNode = currentNode._WorldPos;
-
-            foreach (var neighbour in _Grid.GetNeighbours(currentNode))
-            {
-                if (!neighbour._Walkable || closed.Contains(neighbour))
-                {
-                    continue;
-                }
-
-                _workingNode = neighbour._WorldPos;
-
-                int newCost = currentNode._GCost + ManhattenDistanceInt(currentNode, neighbour);
-                if (newCost < neighbour._GCost || !open.Contains(neighbour))
-                {
-                    // Distance to startNode through parent
-                    neighbour._GCost = newCost;
-
-                    // Distance to target
-                    neighbour._HCost =
-                        ManhattenDistanceInt(neighbour, targetNode);
-
-                    neighbour._parentNode = currentNode;
-
-                    if (!open.Contains(neighbour))
-                    {
-                        open.Add(neighbour);
-                    }
-                }
-
-                if((int)WaitTime > 0)
-                {
-                    yield return new WaitForSeconds(WaitTime);
-                }
-            }
-        }
+        yield return null;
 
         /*
         OPEN //the set of nodes to be evaluated
@@ -195,27 +184,26 @@ public class PathFinding : MonoBehaviour
         return Mathf.RoundToInt(ManhattenDistance(s, e));
     }
 
-    void Retrace(Node startNode, Node targetNode)
+    List<Node> Retrace(Node startNode, Node targetNode)
     {
         // Get's the parents between target and start, and saves it to the _Path list
-        _Path = new List<Node>();
+        List<Node> path = new List<Node>();
         Node current = targetNode;
         while (current != startNode)
         {
-            _Path.Add(current);
+            path.Add(current);
             current = current._parentNode;
         }
 
         // Reverse the list because it's going from target to start
-        _Path.Reverse();
+        path.Reverse();
+        return path;
     }
 
+
+    /*
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawCube(_workingNode + Vector3.up, Vector3.one * (_itemScriptableObject._nodeDiameter - .1f));
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawCube(_pivotNode + Vector3.up, Vector3.one * (_itemScriptableObject._nodeDiameter - .1f));
 
         if (_Path == null || _Path.Count == 0)
         {
@@ -227,5 +215,5 @@ public class PathFinding : MonoBehaviour
         {
             Gizmos.DrawCube(node._WorldPos, Vector3.one * (_itemScriptableObject._nodeDiameter - .1f));
         }
-    }
+    }*/
 }

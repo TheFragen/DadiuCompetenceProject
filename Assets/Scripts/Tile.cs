@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Gamelogic.Extensions;
 using UnityEngine;
 
 #pragma warning disable 649
@@ -38,23 +39,6 @@ public class Tile : MonoBehaviour
 	    }	    
     }
 
-    private void OnDrawGizmos()
-    {
-        if (_itemSpawnPositions == null)
-        {
-            return;
-        }
-        foreach (var node in _itemSpawnPositions)
-        {
-            if (!_Grid._pathFinding.IsInGrid(node))
-            {
-                Gizmos.DrawCube(node, Vector3.one * (_itemScriptableObject._nodeDiameter - .1f));
-            }
-        }
-    }
-
-
-
     List<Vector3> GetTilePositions()
 	{
 		List<Vector3> spawnPositions = new List<Vector3>();
@@ -74,7 +58,7 @@ public class Tile : MonoBehaviour
 				pos.z = pos.z - height / 2 + y * ySpacing + ySpacing/2;
                 
 			    _Grid.AddToGrid(pos);
-				spawnPositions.Add(pos);
+				spawnPositions.Add(pos - new Vector2(xSpacing / 2, ySpacing / 2).To3DXZ(0));
 			}
 		}
 		return spawnPositions;
@@ -83,6 +67,7 @@ public class Tile : MonoBehaviour
     void SpawnObjects(ref List<Vector3> posibleLocations)
 	{
 		List<Item> possibleItems = _itemScriptableObject._itemList;
+
 		int randomIndex = Random.Range(0, possibleItems.Count);
 		int spawnRate = _itemScriptableObject._spawnRate;
 
@@ -93,9 +78,10 @@ public class Tile : MonoBehaviour
 				posibleLocations[Random.Range(0, posibleLocations.Count)];
 			posibleLocations.Remove(position);
 
-			Item itemToSpawn = possibleItems[randomIndex];
-			GameObject item = Instantiate(itemToSpawn.itemObject, position, Quaternion.identity);
+		    AbstractItem itemToSpawn = possibleItems[randomIndex];
+			GameObject item = Instantiate(itemToSpawn.gameObject, position, Quaternion.identity);
 		    item.transform.parent = transform;
+            GameManager.Instance.AddSpawnedItem(item);
 		}
 	}
 }

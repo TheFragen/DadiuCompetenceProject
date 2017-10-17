@@ -12,9 +12,6 @@ MonoBehaviour:
   m_Name: Items_ScriptableObject
   m_EditorClassIdentifier: 
   _itemList:
-  - name: Sample
-    itemObject: {fileID: 1271078597395640, guid: d21f338ec6375ac47a2f8ebf8db6e384,
-      type: 2}
-    isArtefact: 0
+  - {fileID: 114024286512587578, guid: d21f338ec6375ac47a2f8ebf8db6e384, type: 2}
   _spawnRate: 8
   _nodeDiameter: 0.9

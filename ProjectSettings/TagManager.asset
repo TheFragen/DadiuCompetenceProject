@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Maze Tile
   - Generator
+  - Item
   layers:
   - Default
   - TransparentFX

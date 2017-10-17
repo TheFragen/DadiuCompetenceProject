@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using EasyButtons;
+using Gamelogic.Extensions;
 using UnityEngine;
 
 #pragma warning disable 649
-public class Level_PreGenerate : MonoBehaviour
+public class Level_PreGenerate : Singleton<Level_PreGenerate>
 {
+    public bool _LevelIsGenerated;
+
     [SerializeField]
     private GameObject _spawningObject;
 
@@ -33,8 +36,7 @@ public class Level_PreGenerate : MonoBehaviour
         _spawnedTiles.Clear();
     }
 
-    [Button]
-    void RevealMap()
+    public void RevealMap()
     {
         foreach (var tile in _spawnedTiles)
         {
@@ -45,15 +47,13 @@ public class Level_PreGenerate : MonoBehaviour
         }
     }
 
-    [Button]
-    void GenerateMaze() {
+    public void GenerateMaze() {
         _spawnedTiles = new List<GameObject> { _spawningObject };
         StartCoroutine(GenerateMaceDelay(0));
         //GenerateMaceDelay(0);
     }
 
-    [Button]
-    void GenerateWithDelay()
+    public void GenerateWithDelay()
     {
         _spawnedTiles = new List<GameObject> {_spawningObject};
        StartCoroutine(GenerateMaceDelay(.1f));
@@ -74,7 +74,7 @@ public class Level_PreGenerate : MonoBehaviour
 
             // Create a list of possible directions to go based on which sides of the current tile is blocked
             List<int> randomObjectList =
-                GetAllowedDirections(lastObject.transform.position, layerMask, lastObject.GetComponent<Tile>());
+                GetAllowedDirections(position, layerMask, lastObject.GetComponent<Tile>());
 
             // No where to go - Go back to a previous tile
             if (randomObjectList.Count == 0)
@@ -122,20 +122,47 @@ public class Level_PreGenerate : MonoBehaviour
                         .ToList();
                     break;
             }
-            
+
+            Vector3 nextTilePos = position + dirVector * 3;
+            // Up
+            if (Physics.CheckSphere(nextTilePos + Vector3.forward * 1.5f + Vector3.up/2, .2f,
+                layerMask))
+            {
+                possibleTiles.RemoveAll(o => !o.GetComponent<Tile>().BlockedUp);
+            }
+            // Right
+            if (Physics.CheckSphere(nextTilePos + Vector3.right * 1.5f + Vector3.up / 2, .2f,
+                layerMask))
+            {
+                possibleTiles.RemoveAll(o => !o.GetComponent<Tile>().BlockedRight);
+            }
+            // Down
+            if (Physics.CheckSphere(nextTilePos + Vector3.back * 1.5f + Vector3.up / 2, .2f,
+                layerMask))
+            {
+                possibleTiles.RemoveAll(o => !o.GetComponent<Tile>().BlockedDown);
+            }
+            // Left
+            if (Physics.CheckSphere(nextTilePos + Vector3.left * 1.5f + Vector3.up / 2, .2f,
+                layerMask))
+            {
+                possibleTiles.RemoveAll(o => !o.GetComponent<Tile>().BlockedLeft);
+            }
+
             GameObject chosenTile =
                 possibleTiles[Random.Range(0, possibleTiles.Count)];
 
             // Spawn the chosen tile
             lastObject = GenerateTile(position, dirVector, chosenTile);
             _spawnedTiles.Add(lastObject);
-            if ((int) delayTime > 0)
+            if (delayTime > 0)
             {
                 yield return new WaitForSeconds(delayTime);
             }
             
         }
         print("Time of execution: " + (Time.realtimeSinceStartup - startTime));
+        _LevelIsGenerated = true;
         yield return null;
     }
 

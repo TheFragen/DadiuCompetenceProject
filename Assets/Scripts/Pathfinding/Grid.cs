@@ -6,6 +6,9 @@ public class Grid : MonoBehaviour
 {
     public PathFinding _pathFinding;
 
+    [SerializeField]
+    private Items _itemScriptableObject;
+
     private Dictionary<Vector3, Node> _Grid;
     private Vector3 _testPos;
 
@@ -113,10 +116,19 @@ public class Grid : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        if (_testPos != Vector3.zero)
+        if (_Grid == null)
         {
-            Gizmos.color = Color.magenta;
-            Gizmos.DrawSphere(_testPos, .1f);
+            return;
+        }
+
+        foreach (var n in _Grid.Values)
+        {
+            if (!_pathFinding.IsInGrid(n._WorldPos))
+            {
+                Gizmos.color = Color.white;
+                Gizmos.DrawCube(n._WorldPos,
+                    Vector3.one * (_itemScriptableObject._nodeDiameter - .1f));
+            }
         }
     }
 }

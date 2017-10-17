@@ -1,20 +1,20 @@
 ﻿using System.Collections.Generic;
 using Gamelogic.Extensions;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 #pragma warning disable 649
 [RequireComponent(typeof(HumanMotor))]
-public class PlayerInput : MonoBehaviour
-{
+public class PlayerInput : MonoBehaviour {
     [SerializeField]
     private float _MovementDebounce;
-
-    [SerializeField]
-    private Grid _Grid;
 
     private Camera _camera;
 	private HumanMotor _motor;
     private float _lastTime = 0;
+
+    [SerializeField]
+    private bool _hoveringUI;
 
     void Start ()
 	{
@@ -29,17 +29,19 @@ public class PlayerInput : MonoBehaviour
             OnMouseClick();
 		    _lastTime = Time.time;
 		}
-
-	    Node n = _Grid.WorldPosToNode(transform.position);
-	    if (n != null)
-	    {
-	        _Grid.GetNeighbours(n);
-        }
-	    
 	}
 
-	void OnMouseClick()
+    public void SetHovering()
+    {
+        _hoveringUI = !_hoveringUI;
+    }
+
+    void OnMouseClick()
 	{
+	    if (_hoveringUI)
+	    {
+	        return;
+	    }
 		Vector3 mousePos = Input.mousePosition;
 		Vector3 playerPosScreenSpace = _camera.WorldToScreenPoint(transform.position);
 
