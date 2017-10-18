@@ -23,7 +23,7 @@ GameObject:
   - component: {fileID: 114024286512587578}
   - component: {fileID: 65738332954524390}
   m_Layer: 0
-  m_Name: Sample_item
+  m_Name: Hastyboi
   m_TagString: Item
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

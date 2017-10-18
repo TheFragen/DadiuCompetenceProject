@@ -7,7 +7,7 @@ public class FollowPlayer : MonoBehaviour
 	[SerializeField]
 	private float damping = 0.2f;
 	[SerializeField]
-	private GameObject player;
+	private GameObject _player;
 	private Vector3 currentVelocity;
 	private Vector3 initialOffset;
 
@@ -18,7 +18,8 @@ public class FollowPlayer : MonoBehaviour
 
 	void Update()
 	{
-		Vector3 referencePos = player.transform.position;
+	    if (_player == null) return;
+		Vector3 referencePos = _player.transform.position;
 		Vector3 cameraPos = transform.position;
 
 		// Damps the camera position
@@ -28,4 +29,9 @@ public class FollowPlayer : MonoBehaviour
 			ref currentVelocity, damping);
 		transform.position = targetPos;
 	}
+
+    public void SetPlayer(GameObject player)
+    {
+        _player = player;
+    }
 }

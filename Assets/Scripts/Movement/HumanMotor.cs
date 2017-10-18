@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class HumanMotor : MonoBehaviour
 {
-    public delegate void PickupItem(Item item);
+    public delegate void PickupItem(AbstractItem item);
     public event PickupItem OnItemPickup;
 
     private void Start()
@@ -16,7 +16,7 @@ public class HumanMotor : MonoBehaviour
     [Button]
     private void EndTurn()
     {
-        GameManager.Instance.NextTurn();
+        GameManager.Instance.NextTurn(gameObject);
     }
 
     public bool Move(Vector2 direction)
@@ -39,18 +39,35 @@ public class HumanMotor : MonoBehaviour
 
         if (!raycastResult || (hit.transform != null && hit.transform.CompareTag("Item")))
         {
-            transform.position = reference;
-            return true;
+            if (GameManager.Instance.PerformAction(gameObject))
+            {
+                transform.position = reference;
+                return true;
+            }
         }
         return false;
     }
 
+    public Vector3 MoveToTarget(Vector3 origin, Vector3 target)
+    {
+        if (!GameManager.Instance.IsPlayerTurn(gameObject) || !GameManager.Instance.PerformAction(gameObject))        
+        {
+            return origin;
+        }
+        else
+        {
+            return Vector3.MoveTowards(transform.position, target, 1);
+        }
+    }
+
     private void OnTriggerStay(Collider collider)
     {
-        Item _tmp = collider.gameObject.GetComponent("Item") as Item;
+        AbstractItem _tmp = collider.gameObject.GetComponent<AbstractItem>();
         if (_tmp == null) return;
-        if ((transform.position - collider.transform.position).sqrMagnitude <
-            .75)
+
+        Debug.DrawLine(transform.position, collider.transform.position, Color.yellow);
+
+        if ((transform.position - collider.transform.position).sqrMagnitude < 1.25f)
         {
             if (OnItemPickup != null)
             {

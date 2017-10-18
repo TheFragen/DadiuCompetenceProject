@@ -23,9 +23,20 @@ public class PathFinding : MonoBehaviour
     private bool _coroutineRunning = false;
     private Vector3 _lastFramePos = Vector3.zero;
 
+    private Dictionary<GameObject, List<Node>> _PathsActive = new Dictionary<GameObject, List<Node>>();
+
     public bool IsInGrid(Vector3 nodePos) {
-    //    if (_Path == null) return false;
-    //    return _Path.Contains(_Grid.WorldPosToNode(nodePos));
+        if (_PathsActive == null) return false;
+        foreach (var players in _PathsActive)
+        {
+            foreach (var node in players.Value)
+            {
+                if (node._WorldPos == nodePos)
+                {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -38,16 +49,20 @@ public class PathFinding : MonoBehaviour
         }*/
     }
 
-    public List<Node> GeneratePath(Transform start, Transform target)
+    public void AddToActivePaths(GameObject go, List<Node> path)
+    {
+        _PathsActive.Add(go, path);
+    }
+
+    public void RemoveFromActivePaths(GameObject go) {
+        _PathsActive.Remove(go);
+    }
+
+    public List<Node> GeneratePath(Vector3 start, Vector3 target)
     {
         List<Node> path = new List<Node>();
 
         float startTime = Time.realtimeSinceStartup;
-
-        if (start == null || target == null) {
-            Debug.LogError("Start or target is null");
-            return null;
-        }
 
         if (!Level_PreGenerate.Instance._LevelIsGenerated)
         {
@@ -58,8 +73,8 @@ public class PathFinding : MonoBehaviour
         HashSet<Node> closed = new HashSet<Node>();
 
 
-        Node startNode = _Grid.WorldPosToNode(start.position);
-        Node targetNode = _Grid.WorldPosToNode(target.position);
+        Node startNode = _Grid.WorldPosToNode(start);
+        Node targetNode = _Grid.WorldPosToNode(target);
 
         if (startNode == null) {
             Debug.LogError("StartNode is null");
@@ -67,16 +82,14 @@ public class PathFinding : MonoBehaviour
         if (targetNode == null) {
             Debug.LogError("TargetNode is null");
         }
-        if (startNode == null && targetNode == null) {
-            enabled = false;
+        if (startNode == null || targetNode == null) {
+            return null;
         }
 
         _coroutineRunning = true;
         open.Add(startNode);
-
-        //   int runs = 0;
+        
         while (open.Count > 0) {
-            //   print(runs++);
             Node currentNode = open[0];
             // Find lowest fCost node in open
             foreach (var n in open) {
@@ -199,21 +212,23 @@ public class PathFinding : MonoBehaviour
         path.Reverse();
         return path;
     }
-
-
-    /*
+    
+    
     private void OnDrawGizmos()
     {
 
-        if (_Path == null || _Path.Count == 0)
+        if (_PathsActive == null || _PathsActive.Count == 0)
         {
             return;
         }
 
         Gizmos.color = Color.green;
-        foreach (var node in _Path)
+        foreach (var player in _PathsActive)
         {
-            Gizmos.DrawCube(node._WorldPos, Vector3.one * (_itemScriptableObject._nodeDiameter - .1f));
+            foreach (var node in player.Value)
+            {
+                Gizmos.DrawCube(node._WorldPos, Vector3.one * (_itemScriptableObject._nodeDiameter - .1f));
+            }
         }
-    }*/
+    }
 }

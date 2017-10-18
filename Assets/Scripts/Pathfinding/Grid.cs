@@ -69,6 +69,7 @@ public class Grid : MonoBehaviour
 
     public void AddToGrid(Vector3 worldPos)
     {
+        worldPos.y = 0;
         Node node = new Node(true, worldPos);
         _Grid.Add(worldPos, node);
     }
@@ -94,24 +95,52 @@ public class Grid : MonoBehaviour
                 hit.transform.tag == "Maze Tile")
             {
                 tilePos = hit.transform.position;
+               // print("Tile: " + tilePos);
             }
         }
         else
         {
-            return null;
+            return FindClosestNode(worldPos);
         }
+
+       // print("World pos: " + worldPos);
 
         // Snap worldPos to nearest nodePos
         Vector3 normalizedPos = worldPos - tilePos;
+       // print("Normalized pos (before round): " + normalizedPos);
         normalizedPos.x = Mathf.Round(normalizedPos.x);
         normalizedPos.z = Mathf.Round(normalizedPos.z);
+      //  print("Normalized pos (after round): " + normalizedPos);
 
         Vector3 nodePos = tilePos + normalizedPos;
+        nodePos.y = 0;
+        //  print("Node pos: " + nodePos);
 
         Node n;
         _Grid.TryGetValue(nodePos, out n);
+        //print("Found node: " +n);
+
+        // No node found, find the closest node to this position
+        if (n == null)
+        {
+            n = FindClosestNode(worldPos);
+        }
 
         return n;
+    }
+
+    private Node FindClosestNode(Vector3 worldPos)
+    {
+        float minDist = float.MaxValue;
+        Node closestNode = null;
+        
+        foreach (KeyValuePair<Vector3, Node> pos in _Grid) {
+            if ((worldPos - pos.Key).sqrMagnitude < minDist) {
+                minDist = (worldPos - pos.Key).sqrMagnitude;
+                closestNode = pos.Value;
+            }
+        }
+        return closestNode;
     }
 
     void OnDrawGizmos()

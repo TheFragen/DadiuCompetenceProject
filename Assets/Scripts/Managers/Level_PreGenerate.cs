@@ -79,7 +79,17 @@ public class Level_PreGenerate : Singleton<Level_PreGenerate>
             // No where to go - Go back to a previous tile
             if (randomObjectList.Count == 0)
             {
+                GameObject tmp = _spawnedTiles[_spawnedTiles.Count - 1];
                 _spawnedTiles.RemoveAt(_spawnedTiles.Count - 1);
+
+                // We've generated a completely closed maze, so generate a new one
+                if (_spawnedTiles.Count == 0)
+                {
+                    GameObject go = Instantiate(_typesOfTiles[0], tmp.transform.position, Quaternion.identity);
+                    Destroy(tmp);
+                    _spawnedTiles.Add(go);
+                }
+
                 lastObject = _spawnedTiles.Last();
                 --i;
                 continue;
@@ -149,8 +159,18 @@ public class Level_PreGenerate : Singleton<Level_PreGenerate>
                 possibleTiles.RemoveAll(o => !o.GetComponent<Tile>().BlockedLeft);
             }
 
+            // No where to go - Go back to a previous tile
+            if (possibleTiles.Count == 0) {
+                _spawnedTiles.RemoveAt(_spawnedTiles.Count - 1);
+                lastObject = _spawnedTiles.Last();
+                --i;
+                continue;
+            }
+
             GameObject chosenTile =
                 possibleTiles[Random.Range(0, possibleTiles.Count)];
+
+            
 
             // Spawn the chosen tile
             lastObject = GenerateTile(position, dirVector, chosenTile);

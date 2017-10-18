@@ -34,7 +34,7 @@ public class Tile : MonoBehaviour
 	        foreach (var rend in gameObject
 	            .GetComponentsInChildren<Renderer>())
 	        {
-	         //   rend.enabled = false;
+	            rend.enabled = false;
 	        }
 	    }	    
     }
@@ -58,7 +58,7 @@ public class Tile : MonoBehaviour
 				pos.z = pos.z - height / 2 + y * ySpacing + ySpacing/2;
                 
 			    _Grid.AddToGrid(pos);
-				spawnPositions.Add(pos - new Vector2(xSpacing / 2, ySpacing / 2).To3DXZ(0));
+			    spawnPositions.Add(pos);
 			}
 		}
 		return spawnPositions;
