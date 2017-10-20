@@ -56,7 +56,7 @@ public class HumanMotor : MonoBehaviour
         }
         else
         {
-            return Vector3.MoveTowards(transform.position, target, 1);
+            return Vector3.MoveTowards(origin, target, 1);
         }
     }
 

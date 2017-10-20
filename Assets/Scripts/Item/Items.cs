@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Items : ScriptableObject
 {
-	public List<Item> _itemList;
+	public List<AbstractItem> _itemList;
 
 	[Tooltip("Defines how often an item should be spawned." +
 	         " 0 is items will never spawn, 100 is items will always spawn"),

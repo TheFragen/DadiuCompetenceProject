@@ -64,7 +64,7 @@ public class PathFinding : MonoBehaviour
 
         float startTime = Time.realtimeSinceStartup;
 
-        if (!Level_PreGenerate.Instance._LevelIsGenerated)
+        if (!GameManager.Instance._LevelIsGenerated)
         {
             Debug.LogError("No level generated yet");
             return null;

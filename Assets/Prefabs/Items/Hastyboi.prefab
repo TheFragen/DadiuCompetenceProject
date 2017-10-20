@@ -20,8 +20,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4397965442553806}
   - component: {fileID: 212193283802414416}
-  - component: {fileID: 114024286512587578}
   - component: {fileID: 65738332954524390}
+  - component: {fileID: 114261335530889988}
   m_Layer: 0
   m_Name: Hastyboi
   m_TagString: Item
@@ -54,7 +54,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.9, y: 0.9, z: 0.2}
   m_Center: {x: 0.45, y: 0.45, z: 0}
---- !u!114 &114024286512587578
+--- !u!114 &114261335530889988
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -62,10 +62,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1271078597395640}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 36a443ea58eb7814f8a17654b0900898, type: 3}
+  m_Script: {fileID: 11500000, guid: 1c9184a871e691b4aae9248e837fcf57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  name: Cogwheel of Testing
+  name: Haste
   isArtefact: 0
   owner: {fileID: 0}
 --- !u!212 &212193283802414416

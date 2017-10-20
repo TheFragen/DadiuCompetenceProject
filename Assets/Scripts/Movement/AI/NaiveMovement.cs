@@ -3,25 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using EasyButtons;
 using Gamelogic.Extensions;
+using Gamelogic.Extensions.Algorithms;
 using UnityEngine;
 
 [RequireComponent(typeof(HumanMotor))]
 public class NaiveMovement : MonoBehaviour
 {
-    [SerializeField]
-    private PathFinding _PathFinding;
+    [SerializeField] private PathFinding _PathFinding;
 
     private HumanMotor _motor;
-    [SerializeField]
-    public List<Node> _path;
+    [SerializeField] public List<Node> _path;
 
-    [SerializeField]
-    private int _pathIndex = 0;
-    [SerializeField]
-    private GameObject _itemToLookFor;
+    [SerializeField] private int _pathIndex = 0;
+    [SerializeField] private GameObject _itemToLookFor;
 
-    [SerializeField]
-    private float _waitTime;
+    [SerializeField] private float _waitTime;
 
     private Vector3 _targetPos = Vector3.negativeInfinity;
 
@@ -32,7 +28,7 @@ public class NaiveMovement : MonoBehaviour
     private bool _isMoving;
 
     // Use this for initialization
-    void Start ()
+    void Start()
     {
         _motor = GetComponent<HumanMotor>();
         blacklistedNodes = new List<Vector3>();
@@ -40,15 +36,16 @@ public class NaiveMovement : MonoBehaviour
 
     void Update()
     {
+        if (!GameManager.Instance._LevelIsGenerated) return;
         // Check if the AI has a path
-            // If it has a path, do movement
-            // If not find a path
+        // If it has a path, do movement
+        // If not find a path
 
         if (_path == null || _path.Count == 0)
         {
             InitializePath();
         }
-        if (_path != null &&  _path.Count > 0 && !_isMoving)
+        if (_path != null && _path.Count > 0 && !_isMoving)
         {
             StartCoroutine(PerformMovement(_waitTime));
         }
@@ -56,6 +53,7 @@ public class NaiveMovement : MonoBehaviour
 
     void InitializePath()
     {
+        // TODO: Avoid global var
         FindClosestItem();
         _pathIndex = 0;
         if (_itemToLookFor != null)
@@ -69,7 +67,8 @@ public class NaiveMovement : MonoBehaviour
                 print("We have the technology");
                 _targetPos = _path[_path.Count - 1]._WorldPos;
                 _PathFinding.AddToActivePaths(gameObject, _path);
-            } else
+            }
+            else
             {
                 print("We don't have the technology");
                 blacklistedNodes.Add(_itemToLookFor.transform.position);
@@ -88,7 +87,7 @@ public class NaiveMovement : MonoBehaviour
         Vector3 targetPos = _path[_pathIndex]._WorldPos;
         nextNode = targetPos;
 
-        bool didMove = false;
+        bool didMove;
         targetPos.y = transform.position.y;
         Vector3 tmp = transform.position;
         transform.position = _motor.MoveToTarget(transform.position, targetPos);
@@ -112,7 +111,7 @@ public class NaiveMovement : MonoBehaviour
         {
             GameManager.Instance.NextTurn(gameObject);
         }
-        
+
         yield return null;
         _isMoving = false;
     }
@@ -125,19 +124,25 @@ public class NaiveMovement : MonoBehaviour
 
     void FindClosestItem()
     {
-        float minDistance = float.MaxValue;
-        foreach (var item in GameManager.Instance.GetSpawnedItems())
-        {
-            if (!item.gameObject.activeInHierarchy) continue;
-            if (blacklistedNodes.Contains(item.gameObject.transform.position)) continue;
-
-            Vector3 direction = transform.position - item.transform.position;
-            if (direction.sqrMagnitude < minDistance)
-            {
-                _itemToLookFor = item.gameObject;
-                minDistance = direction.sqrMagnitude;
-            }
-        }
+      /*  var spawnedItems = GameManager.Instance.GetSpawnedItems()
+            .Where(o => o.gameObject.activeInHierarchy)
+            .Where(o => !blacklistedNodes.Contains(o.transform.position))
+            .OrderBy(o => (o.transform.position - transform.position).sqrMagnitude)
+            .Take(10);
+        _itemToLookFor = spawnedItems.RandomItem();*/
+          float minDistance = float.MaxValue;
+          foreach (var item in GameManager.Instance.GetSpawnedItems())
+          {
+              if (!item.gameObject.activeInHierarchy) continue;
+              if (blacklistedNodes.Contains(item.gameObject.transform.position)) continue;
+  
+              Vector3 direction = transform.position - item.transform.position;
+              if (direction.sqrMagnitude < minDistance)
+              {
+                  _itemToLookFor = item.gameObject;
+                  minDistance = direction.sqrMagnitude;
+              }
+          }
     }
 
     private void OnDrawGizmos()

@@ -937,11 +937,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96aea20ec58b9f6409928b59dc6e90f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _gridSize: 3
-  _offset: {x: 0, y: 0}
-  _itemScriptableObject: {fileID: 11400000, guid: 3c0c4ce9811477f4589f4107c7b953de,
-    type: 2}
   BlockedUp: 1
   BlockedRight: 1
   BlockedDown: 0
   BlockedLeft: 0
+  prefab: {fileID: 1438217053889506}
+  _gridSize: 3
+  _itemScriptableObject: {fileID: 11400000, guid: 3c0c4ce9811477f4589f4107c7b953de,
+    type: 2}

@@ -10,6 +10,8 @@ public class Tile : MonoBehaviour
     public bool BlockedDown = false;
     public bool BlockedLeft = false;
 
+    public GameObject prefab;
+
     [SerializeField]
 	private int _gridSize;
     [SerializeField]
@@ -34,7 +36,7 @@ public class Tile : MonoBehaviour
 	        foreach (var rend in gameObject
 	            .GetComponentsInChildren<Renderer>())
 	        {
-	            rend.enabled = false;
+	           // rend.enabled = false;
 	        }
 	    }	    
     }
@@ -64,9 +66,9 @@ public class Tile : MonoBehaviour
 		return spawnPositions;
 	}
 
-    void SpawnObjects(ref List<Vector3> posibleLocations)
+    void SpawnObjects(ref List<Vector3> possibleLocations)
 	{
-		List<Item> possibleItems = _itemScriptableObject._itemList;
+		List<AbstractItem> possibleItems = _itemScriptableObject._itemList;
 
 		int randomIndex = Random.Range(0, possibleItems.Count);
 		int spawnRate = _itemScriptableObject._spawnRate;
@@ -75,8 +77,8 @@ public class Tile : MonoBehaviour
 		if (shouldSpawn)
 		{
 			Vector3 position =
-				posibleLocations[Random.Range(0, posibleLocations.Count)];
-			posibleLocations.Remove(position);
+				possibleLocations[Random.Range(0, possibleLocations.Count)];
+			possibleLocations.Remove(position);
 
 		    AbstractItem itemToSpawn = possibleItems[randomIndex];
 			GameObject item = Instantiate(itemToSpawn.gameObject, position, Quaternion.identity);

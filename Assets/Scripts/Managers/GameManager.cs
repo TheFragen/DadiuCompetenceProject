@@ -7,6 +7,8 @@ using UnityEngine.UI;
 
 public class GameManager : Singleton<GameManager>
 {
+    public bool _LevelIsGenerated = false;
+
     [SerializeField]
     private List<GameObject> _players = new List<GameObject>();
 
@@ -20,6 +22,7 @@ public class GameManager : Singleton<GameManager>
     private int _turnIndex = -1;
     private int _playerActions = 2;
     private int _activePlayerActions;
+    private bool _turnHacks = false;
 
     IEnumerator Start() {
         yield return new WaitForSeconds(1);
@@ -31,8 +34,21 @@ public class GameManager : Singleton<GameManager>
     {
         if (Input.GetKeyUp(KeyCode.H))
         {
-            _playerActions = 999;
-            print("Turn hacks activated");
+            if (_playerActions == 999)
+            {
+                _playerActions = 2;
+            }
+            else
+            {
+                _playerActions = 999;
+            }
+            
+            print("Movement hacks  " + (_playerActions == 999 ? "activated" : "deactivated"));
+        }
+        if (Input.GetKeyUp(KeyCode.T))
+        {
+            _turnHacks = !_turnHacks;
+            print("Turn hacks " + (_turnHacks ? "activated" : "deactivated"));
         }
     }
 
@@ -53,6 +69,9 @@ public class GameManager : Singleton<GameManager>
 
     public bool IsPlayerTurn(GameObject player)
     {
+        if (_turnHacks) {
+            return true;
+        }
         return _activePlayer == player;
     }
 
@@ -63,6 +82,10 @@ public class GameManager : Singleton<GameManager>
 
     public bool PerformAction(GameObject player)
     {
+        if (_turnHacks)
+        {
+            return true;
+        }
         if (player == _activePlayer)
         {
             if (_activePlayerActions > 0)
@@ -95,13 +118,14 @@ public class GameManager : Singleton<GameManager>
 
     private IEnumerator DelayTurn()
     {
-        yield return new WaitForSeconds(1.5f);
-        _activePlayer = _players[++_turnIndex];
-        _activePlayerActions = _playerActions;
-
-        if (_turnIndex == _players.Count - 1) {
-            _turnIndex = -1;
+        _turnIndex++;
+        if (_turnIndex == _players.Count) {
+            _turnIndex = 0;
         }
+        yield return new WaitForSeconds(1.5f);
+        _activePlayer = _players[_turnIndex];
+        _activePlayerActions = _playerActions;
+        
         _activePlayerText.text = _activePlayer.name + " is playing his turn.";
     }
 }

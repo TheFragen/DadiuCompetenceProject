@@ -8,8 +8,6 @@ using UnityEngine;
 #pragma warning disable 649
 public class Level_PreGenerate : Singleton<Level_PreGenerate>
 {
-    public bool _LevelIsGenerated;
-
     [SerializeField]
     private GameObject _spawningObject;
 
@@ -21,6 +19,7 @@ public class Level_PreGenerate : Singleton<Level_PreGenerate>
 
     [SerializeField]
     private List<GameObject> _spawnedTiles;
+
 
     [Button]
     void ClearMap()
@@ -47,6 +46,11 @@ public class Level_PreGenerate : Singleton<Level_PreGenerate>
         }
     }
 
+    public List<GameObject> GetTileTypes()
+    {
+        return _typesOfTiles;
+    }
+
     public void GenerateMaze() {
         _spawnedTiles = new List<GameObject> { _spawningObject };
         StartCoroutine(GenerateMaceDelay(0));
@@ -63,6 +67,7 @@ public class Level_PreGenerate : Singleton<Level_PreGenerate>
     {
         float startTime = Time.realtimeSinceStartup;
         GameObject lastObject = _spawningObject;
+        int checks = 0;
         for (int i = 0; i < _numTilesToSpawn; i++)
         {
             Vector3 position = lastObject.transform.position;
@@ -90,14 +95,21 @@ public class Level_PreGenerate : Singleton<Level_PreGenerate>
                     _spawnedTiles.Add(go);
                 }
 
+                if (i <= 0) {
+                    // Completely closed maze - now lets just return the maze then
+                    print("Returning maze after checking for a new direction " + checks + " times.");
+                    break;
+                }
+
                 lastObject = _spawnedTiles.Last();
-                --i;
+                i -= 2;
+             //   yield return null;
                 continue;
             }
 
             // Pick a direction to generate a tile
             int direction =
-                randomObjectList[Random.Range(0, randomObjectList.Count - 1)];
+                randomObjectList[Random.Range(0, randomObjectList.Count)];
 
             // Filter out tiles that are blocked in the direction we want to go
             List<GameObject> possibleTiles = new List<GameObject>();
@@ -161,16 +173,22 @@ public class Level_PreGenerate : Singleton<Level_PreGenerate>
 
             // No where to go - Go back to a previous tile
             if (possibleTiles.Count == 0) {
+                if (i <= 0)
+                {
+                    // Completely closed maze - now lets just return the maze then
+                    print("Returning maze after checking for a new direction " +checks +" times.");
+                    break;
+                }
                 _spawnedTiles.RemoveAt(_spawnedTiles.Count - 1);
                 lastObject = _spawnedTiles.Last();
-                --i;
+                i -= 2;
+                checks++;
+                yield return null;
                 continue;
             }
 
             GameObject chosenTile =
                 possibleTiles[Random.Range(0, possibleTiles.Count)];
-
-            
 
             // Spawn the chosen tile
             lastObject = GenerateTile(position, dirVector, chosenTile);
@@ -182,9 +200,11 @@ public class Level_PreGenerate : Singleton<Level_PreGenerate>
             
         }
         print("Time of execution: " + (Time.realtimeSinceStartup - startTime));
-        _LevelIsGenerated = true;
+        GameManager.Instance._LevelIsGenerated = true;
         yield return null;
     }
+
+    
 
     List<int> GetAllowedDirections(Vector3 inputTile, int layerMask, Tile tile)
     {
@@ -212,6 +232,8 @@ public class Level_PreGenerate : Singleton<Level_PreGenerate>
         }
         return randomObjectList;
     }
+
+    
 
     string PrintHorizontal(int[] arr)
     {
