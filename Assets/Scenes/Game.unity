@@ -4023,7 +4023,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   __messageText: 
   _spawningObject: {fileID: 764606000}
-  _numTilesToSpawn: 500
+  _numTilesToSpawn: 100
   _typesOfTiles:
   - {fileID: 1410405871155540, guid: 922f16306943ae041a6e7d79e269700f, type: 2}
   - {fileID: 1552803741638160, guid: a3439ffd565f9e340914462a2f88ae58, type: 2}
@@ -4543,6 +4543,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  tileCount: 0
 --- !u!114 &1847434351
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -20,6 +20,19 @@ public class Level_PreGenerate : Singleton<Level_PreGenerate>
     [SerializeField]
     private List<GameObject> _spawnedTiles;
 
+    [SerializeField]
+    private GameObject[,] tiles;
+
+    [SerializeField]
+    private Dictionary<Vector3, Tile> tileDict;
+
+    [SerializeField]
+    private int tileCount = 0;
+
+    private List<GameObject> possibleTilesUp;
+    private List<GameObject> possibleTilesRight;
+    private List<GameObject> possibleTilesDown;
+    private List<GameObject> possibleTilesLeft;
 
     [Button]
     void ClearMap()
@@ -33,6 +46,11 @@ public class Level_PreGenerate : Singleton<Level_PreGenerate>
             #endif
         }
         _spawnedTiles.Clear();
+    }
+
+    public Dictionary<Vector3, Tile> GetTileDictionary()
+    {
+        return tileDict;
     }
 
     public void RevealMap()
@@ -65,47 +83,50 @@ public class Level_PreGenerate : Singleton<Level_PreGenerate>
 
     IEnumerator GenerateMaceDelay(float delayTime)
     {
+        tileDict = new Dictionary<Vector3, Tile>();
+        tileDict.Add(_spawningObject.transform.position, _spawningObject.GetComponent<Tile>());
+       // tiles = new GameObject[_numTilesToSpawn+1, _numTilesToSpawn+1];
+       // tiles[_numTilesToSpawn+1/2, _numTilesToSpawn+1/2] = _spawningObject;
+
         float startTime = Time.realtimeSinceStartup;
-        GameObject lastObject = _spawningObject;
+
+        // Up
+        possibleTilesUp = _typesOfTiles
+            .Where(o => !o.GetComponent<Tile>().BlockedDown)
+            .ToList();
+        // Right
+        possibleTilesRight = _typesOfTiles
+            .Where(o => !o.GetComponent<Tile>().BlockedLeft)
+            .ToList();
+        // Down
+        possibleTilesDown = _typesOfTiles
+            .Where(o => !o.GetComponent<Tile>().BlockedUp)
+            .ToList();
+        // Left
+        possibleTilesLeft = _typesOfTiles
+            .Where(o => !o.GetComponent<Tile>().BlockedRight)
+            .ToList();
+        Vector3 lastObject = _spawningObject.transform.position;
+
         int checks = 0;
         for (int i = 0; i < _numTilesToSpawn; i++)
         {
-            Vector3 position = lastObject.transform.position;
+            Vector3 position = lastObject;
             Vector3 dirVector = Vector3.zero;
 
-            // Defines mask such that Physics.CheckSphere ignores the Player collision layer
-            int layerMask = 1 << 8; //0b0001_0000_0000
-            layerMask = ~layerMask; // 0b1110_1111_1111
-
             // Create a list of possible directions to go based on which sides of the current tile is blocked
-            List<int> randomObjectList =
-                GetAllowedDirections(position, layerMask, lastObject.GetComponent<Tile>());
+            List<int> randomObjectList = GetAllowedDirectionsSansPhysics(position, tileDict);
 
             // No where to go - Go back to a previous tile
             if (randomObjectList.Count == 0)
             {
-                GameObject tmp = _spawnedTiles[_spawnedTiles.Count - 1];
-                _spawnedTiles.RemoveAt(_spawnedTiles.Count - 1);
-
-                // We've generated a completely closed maze, so generate a new one
-                if (_spawnedTiles.Count == 0)
-                {
-                    GameObject go = Instantiate(_typesOfTiles[0], tmp.transform.position, Quaternion.identity);
-                    Destroy(tmp);
-                    _spawnedTiles.Add(go);
-                }
-
-                if (i <= 0) {
-                    // Completely closed maze - now lets just return the maze then
-                    print("Returning maze after checking for a new direction " + checks + " times.");
-                    break;
-                }
-
-                lastObject = _spawnedTiles.Last();
-                i -= 2;
-             //   yield return null;
+                lastObject = tileDict.ElementAt(tileDict.Count - 1 - checks).Key;
+                i--;
+                checks++;
+              //  print("Directions = 0");
                 continue;
             }
+            checks = 0;
 
             // Pick a direction to generate a tile
             int direction =
@@ -118,55 +139,51 @@ public class Level_PreGenerate : Singleton<Level_PreGenerate>
                 case 0:
                     // Up
                     dirVector = new Vector3(0, 0, 1);
-                    possibleTiles = _typesOfTiles
-                        .Where(o => !o.GetComponent<Tile>().BlockedDown)
-                        .ToList();
+                    possibleTiles = possibleTilesUp;
                     break;
                 case 1:
                     // Right
                     dirVector = new Vector3(1, 0, 0);
-                    possibleTiles = _typesOfTiles
-                        .Where(o => !o.GetComponent<Tile>().BlockedLeft)
-                        .ToList();
+                    possibleTiles = possibleTilesRight;
                     break;
                 case 2:
                     // Down
                     dirVector = new Vector3(0, 0, -1);
-                    possibleTiles = _typesOfTiles
-                        .Where(o => !o.GetComponent<Tile>().BlockedUp)
-                        .ToList();
+                    possibleTiles = possibleTilesDown;
                     break;
                 case 3:
                     // Left
                     dirVector = new Vector3(-1, 0, 0);
-                    possibleTiles = _typesOfTiles
-                        .Where(o => !o.GetComponent<Tile>().BlockedRight)
-                        .ToList();
+                    possibleTiles = possibleTilesLeft;
                     break;
             }
 
             Vector3 nextTilePos = position + dirVector * 3;
             // Up
-            if (Physics.CheckSphere(nextTilePos + Vector3.forward * 1.5f + Vector3.up/2, .2f,
-                layerMask))
+            Tile northTile;
+            tileDict.TryGetValue(nextTilePos, out northTile);
+            if (northTile != null && northTile.BlockedDown)
             {
                 possibleTiles.RemoveAll(o => !o.GetComponent<Tile>().BlockedUp);
             }
             // Right
-            if (Physics.CheckSphere(nextTilePos + Vector3.right * 1.5f + Vector3.up / 2, .2f,
-                layerMask))
+            Tile eastTile;
+            tileDict.TryGetValue(nextTilePos, out eastTile);
+            if (eastTile != null && eastTile.BlockedLeft)
             {
                 possibleTiles.RemoveAll(o => !o.GetComponent<Tile>().BlockedRight);
             }
             // Down
-            if (Physics.CheckSphere(nextTilePos + Vector3.back * 1.5f + Vector3.up / 2, .2f,
-                layerMask))
+            Tile southTile;
+            tileDict.TryGetValue(nextTilePos, out southTile);
+            if (southTile != null && southTile.BlockedUp)
             {
                 possibleTiles.RemoveAll(o => !o.GetComponent<Tile>().BlockedDown);
             }
             // Left
-            if (Physics.CheckSphere(nextTilePos + Vector3.left * 1.5f + Vector3.up / 2, .2f,
-                layerMask))
+            Tile westTile;
+            tileDict.TryGetValue(nextTilePos, out westTile);
+            if (westTile != null && westTile.BlockedRight)
             {
                 possibleTiles.RemoveAll(o => !o.GetComponent<Tile>().BlockedLeft);
             }
@@ -179,29 +196,43 @@ public class Level_PreGenerate : Singleton<Level_PreGenerate>
                     print("Returning maze after checking for a new direction " +checks +" times.");
                     break;
                 }
-                _spawnedTiles.RemoveAt(_spawnedTiles.Count - 1);
-                lastObject = _spawnedTiles.Last();
-                i -= 2;
+                lastObject = tileDict.ElementAt(tileDict.Count - 1 - checks).Key;
+                checks--;
+                i--;
+                print("Possibletiles = 0");
                 checks++;
-                yield return null;
+              //  yield return null;
                 continue;
             }
+            checks = 0;
 
             GameObject chosenTile =
                 possibleTiles[Random.Range(0, possibleTiles.Count)];
+            Vector3 newPos = position + dirVector * 3;
+            tileDict.Add(newPos, chosenTile.GetComponent<Tile>());
+            lastObject = newPos;
 
-            // Spawn the chosen tile
-            lastObject = GenerateTile(position, dirVector, chosenTile);
-            _spawnedTiles.Add(lastObject);
             if (delayTime > 0)
             {
                 yield return new WaitForSeconds(delayTime);
             }
-            
+            tileCount++;
         }
+        print("Spawning objects");
+        foreach (var element in tileDict)
+        {
+            if (element.Value.prefab == null)
+            {
+                print("Skipping: " +element.Value.transform.gameObject.name);
+                continue;
+            }
+            Instantiate(element.Value.prefab, element.Key, Quaternion.identity);
+        }
+
         print("Time of execution: " + (Time.realtimeSinceStartup - startTime));
         GameManager.Instance._LevelIsGenerated = true;
-        yield return null;
+        print(tileDict.Count);
+        yield return null;  
     }
 
     
@@ -233,7 +264,25 @@ public class Level_PreGenerate : Singleton<Level_PreGenerate>
         return randomObjectList;
     }
 
-    
+    List<int> GetAllowedDirectionsSansPhysics(Vector3 inputTile, Dictionary<Vector3, Tile> dict) {
+        //  Tile tile = inputTile.GetComponent<Tile>();
+        List<int> randomObjectList = new List<int>();
+        if (!dict.ContainsKey(inputTile + Vector3.forward * 3)) {
+            randomObjectList.Add(0);
+        }
+        if (!dict.ContainsKey(inputTile + Vector3.right * 3)) {
+            randomObjectList.Add(1);
+        }
+        if (!dict.ContainsKey(inputTile + Vector3.back * 3)) {
+            randomObjectList.Add(2);
+        }
+        if (!dict.ContainsKey(inputTile + Vector3.left * 3)) {
+            randomObjectList.Add(3);
+        }
+        return randomObjectList;
+    }
+
+
 
     string PrintHorizontal(int[] arr)
     {

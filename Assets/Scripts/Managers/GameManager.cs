@@ -28,9 +28,9 @@ public class GameManager : Singleton<GameManager>
     private List<AbstractItem> _itemList;
 
     IEnumerator Start() {
+        _itemList = new List<AbstractItem>(_ItemScriptableObject._itemList);
         yield return new WaitForSeconds(1);
         _activePlayerText = _activePlayerCanvas.GetComponent<Text>();
-        _itemList = new List<AbstractItem>(_ItemScriptableObject._itemList);
         SetupArtefacts();
         NextTurn(null);
     }

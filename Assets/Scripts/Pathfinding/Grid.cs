@@ -20,48 +20,94 @@ public class Grid : MonoBehaviour
     public List<Node> GetNeighbours(Node node)
     {
         List<Node> neighbours = new List<Node>();
-
-        int layerMask = 1 << 8;
-        layerMask = ~layerMask;
-
+        Dictionary<Vector3, Tile> tileDict =
+            Level_PreGenerate.Instance.GetTileDictionary();
+        
         // North
         Node north;
         _Grid.TryGetValue(node._WorldPos + Vector3.forward, out north);
-        if (north != null &&
-            !Physics.CheckSphere(node._WorldPos + new Vector3(0, .5f, .5f), .1f,
-                layerMask))
+        if (north != null
+        ) //BlockedDown == false
         {
-            neighbours.Add(north);
+            Tile nTile;
+            tileDict.TryGetValue(north._WorldPos + new Vector3(0, 0, 1),
+                out nTile);
+            if (nTile != null)
+            {
+                if (!nTile.BlockedDown)
+                {
+                    neighbours.Add(north);
+                }
+            }
+            else
+            {
+                neighbours.Add(north);
+            }
         }
 
         // East
         Node east;
         _Grid.TryGetValue(node._WorldPos + Vector3.right, out east);
-        if (east != null &&
-            !Physics.CheckSphere(node._WorldPos + new Vector3(.5f, .5f, 0), .1f,
-                layerMask))
+        if (east != null) //BlockedLeft == false
         {
-            neighbours.Add(east);
+            Tile nTile;
+            tileDict.TryGetValue(east._WorldPos + new Vector3(1, 0, 0),
+                out nTile);
+            if (nTile != null)
+            {
+                if (!nTile.BlockedLeft)
+                {
+                    neighbours.Add(east);
+                }
+            }
+            else
+            {
+                neighbours.Add(east);
+            }
         }
 
         // South
         Node south;
         _Grid.TryGetValue(node._WorldPos + Vector3.back, out south);
-        if (south != null &&
-            !Physics.CheckSphere(node._WorldPos + new Vector3(0, .5f, -.5f),
-                .1f, layerMask))
+        if (south != null
+        ) //BlockedUp == false
         {
-            neighbours.Add(south);
+            Tile nTile;
+            tileDict.TryGetValue(south._WorldPos + new Vector3(0, 0, -1),
+                out nTile);
+            if (nTile != null)
+            {
+                if (!nTile.BlockedUp)
+                {
+                    neighbours.Add(south);
+                }
+            }
+            else
+            {
+                neighbours.Add(south);
+            }
         }
 
         // West
         Node west;
         _Grid.TryGetValue(node._WorldPos + Vector3.left, out west);
-        if (west != null &&
-            !Physics.CheckSphere(node._WorldPos + new Vector3(-.5f, .5f, 0),
-                .1f, layerMask))
+        if (west != null
+        ) //BlockedRight == false
         {
-            neighbours.Add(west);
+            Tile nTile;
+            tileDict.TryGetValue(west._WorldPos + new Vector3(-1, 0, 0),
+                out nTile);
+            if (nTile != null)
+            {
+                if (!nTile.BlockedRight)
+                {
+                    neighbours.Add(west);
+                }
+            }
+            else
+            {
+                neighbours.Add(west);
+            }
         }
 
         return neighbours;
