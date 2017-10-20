@@ -2,7 +2,9 @@
 using Gamelogic.Extensions;
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 using EasyButtons;
+using Gamelogic.Extensions.Algorithms;
 using UnityEngine.UI;
 
 public class GameManager : Singleton<GameManager>
@@ -10,11 +12,11 @@ public class GameManager : Singleton<GameManager>
     public bool _LevelIsGenerated = false;
 
     [SerializeField]
+    private Items _ItemScriptableObject;
+    [SerializeField]
     private List<GameObject> _players = new List<GameObject>();
-
     [SerializeField]
     private List<GameObject> _spawnedItems = new List<GameObject>();
-
     [SerializeField]
     private GameObject _activePlayer, _activePlayerCanvas;
 
@@ -23,10 +25,13 @@ public class GameManager : Singleton<GameManager>
     private int _playerActions = 2;
     private int _activePlayerActions;
     private bool _turnHacks = false;
+    private List<AbstractItem> _itemList;
 
     IEnumerator Start() {
         yield return new WaitForSeconds(1);
         _activePlayerText = _activePlayerCanvas.GetComponent<Text>();
+        _itemList = new List<AbstractItem>(_ItemScriptableObject._itemList);
+        SetupArtefacts();
         NextTurn(null);
     }
     
@@ -52,9 +57,34 @@ public class GameManager : Singleton<GameManager>
         }
     }
 
-    public void AddSpawnedItem(GameObject item)
+    void SetupArtefacts()
+    {
+        Debug.Assert(_ItemScriptableObject != null);
+        List<AbstractItem> items = _ItemScriptableObject._itemList.Where(o => o.isArtefact).ToList();
+        foreach (var player in _players)
+        {
+            AbstractItem randomArtefact = items[Random.Range(0, items.Count)];
+            player.GetComponent<Inventory>().SetArtefact(randomArtefact);
+            items.Remove(randomArtefact);
+            if (player.name.ToUpper().Equals("PLAYER"))
+            {
+                JuiceController.Instance.SetNeededArtefact(randomArtefact);
+            }
+        }
+    }
+
+    public List<AbstractItem> GetItemList()
+    {
+        return _itemList;
+    }
+
+    public void AddSpawnedItem(GameObject item, AbstractItem aItem)
     {
         _spawnedItems.Add(item);
+        if (aItem.isArtefact)
+        {
+            _itemList.Remove(aItem);
+        }
     }
 
     public void RemoveSpawnedItem(GameObject item)

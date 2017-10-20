@@ -11,10 +11,26 @@ public class JuiceController : Singleton<JuiceController>
     [SerializeField]
     private AnimationCurve UseItemCurve;
 
+    [SerializeField]
+    private Text NeededArtefactCanvas;
+    [SerializeField]
+    private Text ArtefactAnnounceCanvas;
+
     public void SetItemUsedText(string text)
     {
         UseItemCanvas.text = text;
         StartCoroutine(TweenAlpha(UseItemCanvas, 0, 1, 1));
+    }
+
+    public void SetNeededArtefact(AbstractItem item)
+    {
+        NeededArtefactCanvas.text = "You need to find\n" +item.name;
+        StartCoroutine(TweenAlpha(NeededArtefactCanvas, 0, 1, 0));
+    }
+
+    public void AnnounceArtefact(AbstractItem item) {
+        ArtefactAnnounceCanvas.text = item.owner.name +" has found his artefact.\nCatch him before he returns to Tristam";
+        StartCoroutine(TweenAlpha(ArtefactAnnounceCanvas, 0, 1, 0));
     }
 
     IEnumerator TweenAlpha(Text affect, float fromAlpha, float toAlpha, float holdTime)

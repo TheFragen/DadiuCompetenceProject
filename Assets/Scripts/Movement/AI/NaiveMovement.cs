@@ -15,7 +15,6 @@ public class NaiveMovement : MonoBehaviour
     [SerializeField] public List<Node> _path;
 
     [SerializeField] private int _pathIndex = 0;
-    [SerializeField] private GameObject _itemToLookFor;
 
     [SerializeField] private float _waitTime;
 
@@ -53,13 +52,12 @@ public class NaiveMovement : MonoBehaviour
 
     void InitializePath()
     {
-        // TODO: Avoid global var
-        FindClosestItem();
+        GameObject itemToLookFor = FindClosestItem();
         _pathIndex = 0;
-        if (_itemToLookFor != null)
+        if (itemToLookFor != null)
         {
             print("Initalizing new target");
-            Vector3 target = _itemToLookFor.transform.position;
+            Vector3 target = itemToLookFor.transform.position;
             target.y = -1.34f;
             _path = _PathFinding.GeneratePath(transform.position, target);
             if (_path != null && _path.Count > 0)
@@ -71,8 +69,8 @@ public class NaiveMovement : MonoBehaviour
             else
             {
                 print("We don't have the technology");
-                blacklistedNodes.Add(_itemToLookFor.transform.position);
-                _itemToLookFor = null;
+                blacklistedNodes.Add(itemToLookFor.transform.position);
+                itemToLookFor = null;
             }
         }
     }
@@ -122,27 +120,30 @@ public class NaiveMovement : MonoBehaviour
         GameManager.Instance.IncreaseAction(gameObject, 2);
     }
 
-    void FindClosestItem()
+    private GameObject FindClosestItem()
     {
-      /*  var spawnedItems = GameManager.Instance.GetSpawnedItems()
-            .Where(o => o.gameObject.activeInHierarchy)
-            .Where(o => !blacklistedNodes.Contains(o.transform.position))
-            .OrderBy(o => (o.transform.position - transform.position).sqrMagnitude)
-            .Take(10);
-        _itemToLookFor = spawnedItems.RandomItem();*/
-          float minDistance = float.MaxValue;
-          foreach (var item in GameManager.Instance.GetSpawnedItems())
-          {
-              if (!item.gameObject.activeInHierarchy) continue;
-              if (blacklistedNodes.Contains(item.gameObject.transform.position)) continue;
-  
-              Vector3 direction = transform.position - item.transform.position;
-              if (direction.sqrMagnitude < minDistance)
-              {
-                  _itemToLookFor = item.gameObject;
-                  minDistance = direction.sqrMagnitude;
-              }
-          }
+        /*  var spawnedItems = GameManager.Instance.GetSpawnedItems()
+              .Where(o => o.gameObject.activeInHierarchy)
+              .Where(o => !blacklistedNodes.Contains(o.transform.position))
+              .OrderBy(o => (o.transform.position - transform.position).sqrMagnitude)
+              .Take(10);
+          _itemToLookFor = spawnedItems.RandomItem();*/
+        float minDistance = float.MaxValue;
+        GameObject itemToLookfor = null;
+        foreach (var item in GameManager.Instance.GetSpawnedItems())
+        {
+            if (!item.gameObject.activeInHierarchy) continue;
+            if (blacklistedNodes.Contains(item.gameObject.transform.position))
+                continue;
+
+            Vector3 direction = transform.position - item.transform.position;
+            if (direction.sqrMagnitude < minDistance)
+            {
+                itemToLookfor = item.gameObject;
+                minDistance = direction.sqrMagnitude;
+            }
+        }
+        return itemToLookfor;
     }
 
     private void OnDrawGizmos()

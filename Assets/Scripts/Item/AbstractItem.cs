@@ -13,7 +13,10 @@ public class AbstractItem : MonoBehaviour
 
     public virtual void Use()
     {
-        Debug.Log("Used item: " + name);
-        owner.GetComponent<Inventory>().RemoveItem(this);
+        if (!isArtefact)
+        {
+            Debug.Log("Used item: " + name);
+            owner.GetComponent<Inventory>().RemoveItem(this);
+        }
     }
 }

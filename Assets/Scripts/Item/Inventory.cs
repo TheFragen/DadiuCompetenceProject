@@ -8,10 +8,11 @@ public class Inventory : MonoBehaviour
     [SerializeField]
     private GameObject _canvasPanel, _buttonPrefab;
     [SerializeField]
+    private AbstractItem _ArtefactToFind;
+    [SerializeField]
     private List<AbstractItem> _Inventory;
 
     private Dictionary<AbstractItem, GameObject> itemButtonDictionary;
-
     private HumanMotor _hm;
 
     void Start()
@@ -37,10 +38,21 @@ public class Inventory : MonoBehaviour
         _Inventory.Add(item);
         GameManager.Instance.RemoveSpawnedItem(item.gameObject);
 
+        if (_ArtefactToFind.name.Equals(item.name))
+        {
+            print("<color=green>" +gameObject.name +" found the item</color>");
+            JuiceController.Instance.AnnounceArtefact(item);
+        }
+
         if (_canvasPanel != null)
         {
             CreateCanvasButton(item);
         }
+    }
+
+    public void SetArtefact(AbstractItem item)
+    {
+        _ArtefactToFind = item;
     }
 
     public void RemoveItem(AbstractItem item)
