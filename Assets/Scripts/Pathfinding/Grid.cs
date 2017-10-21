@@ -22,12 +22,15 @@ public class Grid : MonoBehaviour
         List<Node> neighbours = new List<Node>();
         Dictionary<Vector3, Tile> tileDict =
             Level_PreGenerate.Instance.GetTileDictionary();
-        
+        int layerMask = 1 << 8;
+        layerMask = ~layerMask;
+
         // North
         Node north;
         _Grid.TryGetValue(node._WorldPos + Vector3.forward, out north);
-        if (north != null
-        ) //BlockedDown == false
+        if (north != null &&
+            !Physics.CheckSphere(node._WorldPos + new Vector3(0, .5f, .5f), .1f,
+                layerMask))
         {
             Tile nTile;
             tileDict.TryGetValue(north._WorldPos + new Vector3(0, 0, 1),
@@ -48,7 +51,9 @@ public class Grid : MonoBehaviour
         // East
         Node east;
         _Grid.TryGetValue(node._WorldPos + Vector3.right, out east);
-        if (east != null) //BlockedLeft == false
+        if (east != null &&
+            !Physics.CheckSphere(node._WorldPos + new Vector3(.5f, .5f, 0), .1f,
+                layerMask))
         {
             Tile nTile;
             tileDict.TryGetValue(east._WorldPos + new Vector3(1, 0, 0),
@@ -69,8 +74,9 @@ public class Grid : MonoBehaviour
         // South
         Node south;
         _Grid.TryGetValue(node._WorldPos + Vector3.back, out south);
-        if (south != null
-        ) //BlockedUp == false
+        if (south != null &&
+            !Physics.CheckSphere(node._WorldPos + new Vector3(0, .5f, -.5f),
+                .1f, layerMask))
         {
             Tile nTile;
             tileDict.TryGetValue(south._WorldPos + new Vector3(0, 0, -1),
@@ -91,8 +97,9 @@ public class Grid : MonoBehaviour
         // West
         Node west;
         _Grid.TryGetValue(node._WorldPos + Vector3.left, out west);
-        if (west != null
-        ) //BlockedRight == false
+        if (west != null &&
+            !Physics.CheckSphere(node._WorldPos + new Vector3(-.5f, .5f, 0),
+                .1f, layerMask))
         {
             Tile nTile;
             tileDict.TryGetValue(west._WorldPos + new Vector3(-1, 0, 0),

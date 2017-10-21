@@ -16,5 +16,5 @@ MonoBehaviour:
   - {fileID: 114585554144746732, guid: 3a78f65584cd3af4dbaa93d3ae383ba3, type: 2}
   - {fileID: 114985141674940526, guid: df035a76f0a185e4c8f1e9eceaac1470, type: 2}
   - {fileID: 114496336411112072, guid: 5ab3a20687c11b8419308370e1d12904, type: 2}
-  _spawnRate: 100
+  _spawnRate: 19
   _nodeDiameter: 0.9

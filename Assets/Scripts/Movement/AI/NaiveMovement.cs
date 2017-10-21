@@ -25,6 +25,7 @@ public class NaiveMovement : MonoBehaviour
 
     private List<Vector3> blacklistedNodes;
     private bool _isMoving;
+    private GameObject _itemToLookFor;
 
     // Use this for initialization
     void Start()
@@ -52,25 +53,25 @@ public class NaiveMovement : MonoBehaviour
 
     void InitializePath()
     {
-        GameObject itemToLookFor = FindClosestItem();
+        _itemToLookFor = FindClosestItem();
         _pathIndex = 0;
-        if (itemToLookFor != null)
+        if (_itemToLookFor != null)
         {
-            print("Initalizing new target");
-            Vector3 target = itemToLookFor.transform.position;
+        //    print("Initalizing new target");
+            Vector3 target = _itemToLookFor.transform.position;
             target.y = -1.34f;
             _path = _PathFinding.GeneratePath(transform.position, target);
             if (_path != null && _path.Count > 0)
             {
-                print("We have the technology");
+             //   print("We have the technology");
                 _targetPos = _path[_path.Count - 1]._WorldPos;
                 _PathFinding.AddToActivePaths(gameObject, _path);
             }
             else
             {
-                print("We don't have the technology");
-                blacklistedNodes.Add(itemToLookFor.transform.position);
-                itemToLookFor = null;
+               // print("We don't have the technology");
+                blacklistedNodes.Add(_itemToLookFor.transform.position);
+                _itemToLookFor = null;
             }
         }
     }
@@ -78,6 +79,15 @@ public class NaiveMovement : MonoBehaviour
     IEnumerator PerformMovement(float delay)
     {
         _isMoving = true;
+        // The item has been picked up - find another one #DJ Khaled
+        if (!_itemToLookFor.activeInHierarchy)
+        {
+            print("Another one");
+            _PathFinding.RemoveFromActivePaths(gameObject);
+            _path = null;
+            _isMoving = false;
+            yield break;
+        }
         if (delay > 0)
         {
             yield return new WaitForSeconds(delay);

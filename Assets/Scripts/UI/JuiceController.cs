@@ -7,14 +7,27 @@ using UnityEngine.UI;
 public class JuiceController : Singleton<JuiceController>
 {
     [SerializeField]
+    private Button NextTurnButton;
+    [SerializeField]
     private Text UseItemCanvas;
     [SerializeField]
     private AnimationCurve UseItemCurve;
-
     [SerializeField]
     private Text NeededArtefactCanvas;
     [SerializeField]
     private Text ArtefactAnnounceCanvas;
+
+    public void SetEndTurnButton(GameObject player)
+    {
+        if (player != null && player.name.ToUpper().Equals("PLAYER"))
+        {
+            NextTurnButton.interactable = true;
+        }
+        else
+        {
+            NextTurnButton.interactable = false;
+        }
+    }
 
     public void SetItemUsedText(string text)
     {

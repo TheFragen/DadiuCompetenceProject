@@ -141,6 +141,7 @@ public class GameManager : Singleton<GameManager>
     public void NextTurn(GameObject player)
     {
         if (player != _activePlayer) return;
+        JuiceController.instance.SetEndTurnButton(null);
         _activePlayer = null;
         Camera.main.GetComponent<FollowPlayer>().SetPlayer(_players[_turnIndex + 1]);
         StartCoroutine(DelayTurn());
@@ -155,7 +156,7 @@ public class GameManager : Singleton<GameManager>
         yield return new WaitForSeconds(1.5f);
         _activePlayer = _players[_turnIndex];
         _activePlayerActions = _playerActions;
-        
+        JuiceController.instance.SetEndTurnButton(_activePlayer);
         _activePlayerText.text = _activePlayer.name + " is playing his turn.";
     }
 }

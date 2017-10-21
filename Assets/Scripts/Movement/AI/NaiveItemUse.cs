@@ -17,13 +17,13 @@ public class NaiveItemUse : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-        if (_inventory != null && _inventory.Count > 0)
+        List<AbstractItem> itemCopy = new List<AbstractItem>(_inventory);
+        foreach (var item in itemCopy)
         {
-            if (_inventory[0] != null)
+            if (item != null && !item.isArtefact && _inventory.Contains(item))
             {
-                _inventory[0].Use();
+                item.Use();
             }
-            
-        }	
+        }
 	}
 }

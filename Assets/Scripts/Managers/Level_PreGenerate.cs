@@ -78,15 +78,17 @@ public class Level_PreGenerate : Singleton<Level_PreGenerate>
     public void GenerateWithDelay()
     {
         _spawnedTiles = new List<GameObject> {_spawningObject};
-       StartCoroutine(GenerateMaceDelay(.1f));
+       StartCoroutine(GenerateMaceDelay(.5f));
     }
 
     IEnumerator GenerateMaceDelay(float delayTime)
     {
-        tileDict = new Dictionary<Vector3, Tile>();
-        tileDict.Add(_spawningObject.transform.position, _spawningObject.GetComponent<Tile>());
-       // tiles = new GameObject[_numTilesToSpawn+1, _numTilesToSpawn+1];
-       // tiles[_numTilesToSpawn+1/2, _numTilesToSpawn+1/2] = _spawningObject;
+        tileDict = new Dictionary<Vector3, Tile>
+        {
+            { _spawningObject.transform.position, _spawningObject.GetComponent<Tile>() }
+        };
+        // tiles = new GameObject[_numTilesToSpawn+1, _numTilesToSpawn+1];
+        // tiles[_numTilesToSpawn+1/2, _numTilesToSpawn+1/2] = _spawningObject;
 
         float startTime = Time.realtimeSinceStartup;
 
@@ -107,20 +109,26 @@ public class Level_PreGenerate : Singleton<Level_PreGenerate>
             .Where(o => !o.GetComponent<Tile>().BlockedRight)
             .ToList();
         Vector3 lastObject = _spawningObject.transform.position;
+        Tile lastTile = _spawningObject.GetComponent<Tile>();
 
         int checks = 0;
         for (int i = 0; i < _numTilesToSpawn; i++)
         {
             Vector3 position = lastObject;
             Vector3 dirVector = Vector3.zero;
-
             // Create a list of possible directions to go based on which sides of the current tile is blocked
-            List<int> randomObjectList = GetAllowedDirectionsSansPhysics(position, tileDict);
+            List<int> allowedDirections = GetAllowedDirectionsSansPhysics(position, tileDict, lastTile);
 
             // No where to go - Go back to a previous tile
-            if (randomObjectList.Count == 0)
+            if (allowedDirections.Count == 0)
             {
+                if (tileDict.Count - 1 - checks < 0)
+                {
+                    print("Breaking: Something went wrong");
+                    break;
+                }
                 lastObject = tileDict.ElementAt(tileDict.Count - 1 - checks).Key;
+                lastTile = tileDict.ElementAt(tileDict.Count - 1 - checks).Value;
                 i--;
                 checks++;
               //  print("Directions = 0");
@@ -130,61 +138,71 @@ public class Level_PreGenerate : Singleton<Level_PreGenerate>
 
             // Pick a direction to generate a tile
             int direction =
-                randomObjectList[Random.Range(0, randomObjectList.Count)];
+                allowedDirections[Random.Range(0, allowedDirections.Count)];
 
             // Filter out tiles that are blocked in the direction we want to go
             List<GameObject> possibleTiles = new List<GameObject>();
+            string dirLiteral = "";
             switch (direction)
             {
                 case 0:
                     // Up
                     dirVector = new Vector3(0, 0, 1);
-                    possibleTiles = possibleTilesUp;
+                    dirLiteral = "Up";
+                    possibleTiles = new List<GameObject>(possibleTilesUp);
                     break;
                 case 1:
                     // Right
                     dirVector = new Vector3(1, 0, 0);
-                    possibleTiles = possibleTilesRight;
+                    dirLiteral = "Right";
+                    possibleTiles = new List<GameObject>(possibleTilesRight);
                     break;
                 case 2:
                     // Down
                     dirVector = new Vector3(0, 0, -1);
-                    possibleTiles = possibleTilesDown;
+                    dirLiteral = "Down";
+                    possibleTiles = new List<GameObject>(possibleTilesDown);
                     break;
                 case 3:
                     // Left
                     dirVector = new Vector3(-1, 0, 0);
-                    possibleTiles = possibleTilesLeft;
+                    dirLiteral = "Left";
+                    possibleTiles = new List<GameObject>(possibleTilesLeft);
                     break;
             }
+          //  print("Direction: " + dirLiteral);
 
             Vector3 nextTilePos = position + dirVector * 3;
             // Up
             Tile northTile;
-            tileDict.TryGetValue(nextTilePos, out northTile);
+            tileDict.TryGetValue(nextTilePos + Vector3.forward * 3, out northTile);
             if (northTile != null && northTile.BlockedDown)
             {
+            //    print("Removed");
                 possibleTiles.RemoveAll(o => !o.GetComponent<Tile>().BlockedUp);
             }
             // Right
             Tile eastTile;
-            tileDict.TryGetValue(nextTilePos, out eastTile);
+            tileDict.TryGetValue(nextTilePos + Vector3.right * 3, out eastTile);
             if (eastTile != null && eastTile.BlockedLeft)
             {
+             //   print("Removed");
                 possibleTiles.RemoveAll(o => !o.GetComponent<Tile>().BlockedRight);
             }
             // Down
             Tile southTile;
-            tileDict.TryGetValue(nextTilePos, out southTile);
+            tileDict.TryGetValue(nextTilePos + Vector3.back * 3, out southTile);
             if (southTile != null && southTile.BlockedUp)
             {
+          //      print("Removed");
                 possibleTiles.RemoveAll(o => !o.GetComponent<Tile>().BlockedDown);
             }
             // Left
             Tile westTile;
-            tileDict.TryGetValue(nextTilePos, out westTile);
+            tileDict.TryGetValue(nextTilePos + Vector3.left * 3, out westTile);
             if (westTile != null && westTile.BlockedRight)
             {
+           //     print("Removed");
                 possibleTiles.RemoveAll(o => !o.GetComponent<Tile>().BlockedLeft);
             }
 
@@ -197,25 +215,28 @@ public class Level_PreGenerate : Singleton<Level_PreGenerate>
                     break;
                 }
                 lastObject = tileDict.ElementAt(tileDict.Count - 1 - checks).Key;
+                lastTile = tileDict.ElementAt(tileDict.Count - 1 - checks).Value;
                 checks--;
                 i--;
-                print("Possibletiles = 0");
+             //   print("Possibletiles = 0");
                 checks++;
               //  yield return null;
                 continue;
             }
             checks = 0;
-
+          //  print("Num possible tiles: " +possibleTiles.Count);
             GameObject chosenTile =
                 possibleTiles[Random.Range(0, possibleTiles.Count)];
             Vector3 newPos = position + dirVector * 3;
             tileDict.Add(newPos, chosenTile.GetComponent<Tile>());
             lastObject = newPos;
+            lastTile = chosenTile.GetComponent<Tile>();
 
             if (delayTime > 0)
             {
                 yield return new WaitForSeconds(delayTime);
             }
+            
             tileCount++;
         }
         print("Spawning objects");
@@ -229,7 +250,7 @@ public class Level_PreGenerate : Singleton<Level_PreGenerate>
             Instantiate(element.Value.prefab, element.Key, Quaternion.identity);
         }
 
-        print("Time of execution: " + (Time.realtimeSinceStartup - startTime));
+        print("<color=blue>Time of execution:</color> " + (Time.realtimeSinceStartup - startTime));
         GameManager.Instance._LevelIsGenerated = true;
         print(tileDict.Count);
         yield return null;  
@@ -264,21 +285,34 @@ public class Level_PreGenerate : Singleton<Level_PreGenerate>
         return randomObjectList;
     }
 
-    List<int> GetAllowedDirectionsSansPhysics(Vector3 inputTile, Dictionary<Vector3, Tile> dict) {
-        //  Tile tile = inputTile.GetComponent<Tile>();
+    List<int> GetAllowedDirectionsSansPhysics(Vector3 inputTile, Dictionary<Vector3, Tile> dict, Tile tile) {
         List<int> randomObjectList = new List<int>();
-        if (!dict.ContainsKey(inputTile + Vector3.forward * 3)) {
+
+        // Checks if the previous tile is open in any of the four directions, and checks if there already is something there
+        Tile northTile;
+        dict.TryGetValue(inputTile + Vector3.forward * 3, out northTile);
+        if (!tile.BlockedUp && northTile == null) {
             randomObjectList.Add(0);
         }
-        if (!dict.ContainsKey(inputTile + Vector3.right * 3)) {
+        // Right
+        Tile eastTile;
+        dict.TryGetValue(inputTile + Vector3.right * 3, out eastTile);
+        if (!tile.BlockedRight && eastTile == null) {
             randomObjectList.Add(1);
         }
-        if (!dict.ContainsKey(inputTile + Vector3.back * 3)) {
+        // Down
+        Tile southTile;
+        dict.TryGetValue(inputTile + Vector3.back * 3, out southTile);
+        if (!tile.BlockedDown && southTile == null) {
             randomObjectList.Add(2);
         }
-        if (!dict.ContainsKey(inputTile + Vector3.left * 3)) {
+        // Left
+        Tile westTile;
+        dict.TryGetValue(inputTile + Vector3.left * 3, out westTile);
+        if (!tile.BlockedLeft && westTile == null) {
             randomObjectList.Add(3);
         }
+        
         return randomObjectList;
     }
 
