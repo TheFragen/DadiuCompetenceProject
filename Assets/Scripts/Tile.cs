@@ -41,7 +41,7 @@ public class Tile : MonoBehaviour
             foreach (var rend in gameObject
                 .GetComponentsInChildren<Renderer>())
             {
-                // rend.enabled = false;
+                 rend.enabled = false;
             }
         }
     }
@@ -84,10 +84,12 @@ public class Tile : MonoBehaviour
             Vector3 position =
                 possibleLocations[Random.Range(0, possibleLocations.Count)];
             possibleLocations.Remove(position);
+            position.y = 0;
 
             AbstractItem itemToSpawn = possibleItems[randomIndex];
             GameObject item = Instantiate(itemToSpawn.gameObject, position,
                 Quaternion.identity);
+            itemToSpawn.sprite = itemToSpawn.gameObject.transform.GetChild(0).GetComponent<SpriteRenderer>().sprite;
             item.transform.parent = transform;
             GameManager.Instance.AddSpawnedItem(item, itemToSpawn);
         }

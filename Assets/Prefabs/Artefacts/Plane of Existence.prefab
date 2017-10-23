@@ -96,7 +96,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   name: Plane of Existence
   isArtefact: 1
+  isIdentified: 0
   owner: {fileID: 0}
+  sprite: {fileID: 0}
 --- !u!212 &212409021021399696
 SpriteRenderer:
   m_ObjectHideFlags: 1

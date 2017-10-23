@@ -42,7 +42,7 @@ public class Inventory : MonoBehaviour
         if (_ArtefactToFind.name.Equals(item.name))
         {
             print("<color=green>" +gameObject.name +" found the item</color>");
-            JuiceController.Instance.AnnounceArtefact(item);
+            JuiceController.Instance.AnnounceArtefact(item, null);
             ArtefactFound = true;
         }
 
@@ -72,12 +72,23 @@ public class Inventory : MonoBehaviour
         return _Inventory;
     }
 
+    public bool HasAnyArtifact()
+    {
+        foreach (var item in _Inventory)
+        {
+            if (item.isArtefact)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     void CreateCanvasButton(AbstractItem item)
     {
         GameObject tmpButton = Instantiate(_buttonPrefab);
         tmpButton.GetComponent<Button>().onClick.AddListener(item.Use);
-        tmpButton.GetComponent<Image>().sprite =
-            item.gameObject.transform.GetChild(0).GetComponent<SpriteRenderer>().sprite;
+        tmpButton.GetComponent<Image>().sprite = item.sprite;
         tmpButton.name = item.name;
         tmpButton.transform.SetParent(_canvasPanel.transform);
         itemButtonDictionary.Add(item, tmpButton);

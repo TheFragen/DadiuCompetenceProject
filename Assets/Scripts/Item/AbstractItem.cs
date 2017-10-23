@@ -7,9 +7,20 @@ public class AbstractItem : MonoBehaviour
 {
     public string name;
     public bool isArtefact;
+    public bool isIdentified;
 
     [HideInInspector]
     public GameObject owner;
+    [HideInInspector]
+    public Sprite sprite;
+
+    void Start()
+    {
+        if (sprite == null)
+        {
+            sprite = gameObject.transform.GetChild(0).GetComponent<SpriteRenderer>().sprite;
+        }
+    }
 
     public virtual void Use()
     {

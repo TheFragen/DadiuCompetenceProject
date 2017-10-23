@@ -14,7 +14,7 @@ public class ReturningState : State
 
     public override void OnStateEnter()
     {
-        _path = _ai._PathFinding.GeneratePath(_ai.transform.position, Vector3.zero);
+        _path = _ai._PathFinding.GeneratePath(_ai.transform.position, new Vector3(-1,0,1));
     }
 
     public override void Tick()

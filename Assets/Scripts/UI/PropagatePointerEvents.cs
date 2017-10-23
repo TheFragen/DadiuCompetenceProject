@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
@@ -9,7 +10,11 @@ public class PropagatePointerEvents : MonoBehaviour, IPointerEnterHandler, IPoin
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        OnPointerEnterEvent.Invoke();
+        GameObject[] any = eventData.hovered.Where(o => o.activeSelf).ToArray();
+        if (any.Length > 0)
+        {
+            OnPointerEnterEvent.Invoke();
+        }
     }
 
     public void OnPointerExit(PointerEventData eventData)

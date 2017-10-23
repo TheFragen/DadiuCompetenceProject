@@ -96,7 +96,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   name: The Stick of Truth
   isArtefact: 1
+  isIdentified: 0
   owner: {fileID: 0}
+  sprite: {fileID: 0}
 --- !u!212 &212534904307756818
 SpriteRenderer:
   m_ObjectHideFlags: 1

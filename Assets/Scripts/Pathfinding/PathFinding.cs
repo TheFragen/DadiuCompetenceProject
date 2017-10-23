@@ -165,10 +165,9 @@ public class PathFinding : MonoBehaviour
 
     float ManhattenDistance(Node s, Node e)
     {
-        float D = 1;
         float dx = Mathf.Abs(s._WorldPos.x - e._WorldPos.x);
-        float dy = Mathf.Abs(s._WorldPos.y - e._WorldPos.y);
-        return D * (dx + dy);
+        float dz = Mathf.Abs(s._WorldPos.z - e._WorldPos.z);
+        return dx + dz;
     }
 
     int ManhattenDistanceInt(Node s, Node e)

@@ -25,6 +25,7 @@ public class MovingState : State
         }
         else
         {
+            Debug.Log("Blacklisting: " +_ai._ItemToLookFor.name);
             _ai.SetState(new SearchingState(_ai));
             _ai._BlacklsitedNodes.Add(_ai._ItemToLookFor);
 

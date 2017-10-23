@@ -77,9 +77,9 @@ public class HumanMotor : MonoBehaviour
         }
     }
 
-    private void OnTriggerStay(Collider collider)
+    public void InvokeItemPickup(Collider collider)
     {
-        if (!_LevelIsGenerated) return;
+        //   if (!_LevelIsGenerated) return;
         AbstractItem _tmp = collider.gameObject.GetComponent<AbstractItem>();
         if (_tmp == null) return;
 
