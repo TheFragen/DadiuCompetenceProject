@@ -9,7 +9,9 @@ using UnityEngine.UI;
 
 public class GameManager : Singleton<GameManager>
 {
-    public bool _LevelIsGenerated = false;
+  //  public bool _LevelIsGenerated = false;
+    public delegate void LevelGenerated();
+    public static event LevelGenerated OnLevelGenerated;
 
     [SerializeField]
     private Items _ItemScriptableObject;
@@ -54,6 +56,14 @@ public class GameManager : Singleton<GameManager>
         {
             _turnHacks = !_turnHacks;
             print("Turn hacks " + (_turnHacks ? "activated" : "deactivated"));
+        }
+    }
+
+    public void SetLevelGenerated()
+    {
+        if (OnLevelGenerated != null)
+        {
+            OnLevelGenerated.Invoke();
         }
     }
 
@@ -143,16 +153,16 @@ public class GameManager : Singleton<GameManager>
         if (player != _activePlayer) return;
         JuiceController.instance.SetEndTurnButton(null);
         _activePlayer = null;
-        Camera.main.GetComponent<FollowPlayer>().SetPlayer(_players[_turnIndex + 1]);
+        _turnIndex++;
+        if (_turnIndex == _players.Count) {
+            _turnIndex = 0;
+        }
+        Camera.main.GetComponent<FollowPlayer>().SetPlayer(_players[_turnIndex]);
         StartCoroutine(DelayTurn());
     }
 
     private IEnumerator DelayTurn()
     {
-        _turnIndex++;
-        if (_turnIndex == _players.Count) {
-            _turnIndex = 0;
-        }
         yield return new WaitForSeconds(1.5f);
         _activePlayer = _players[_turnIndex];
         _activePlayerActions = _playerActions;

@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class Inventory : MonoBehaviour
 {
+    public bool ArtefactFound = false;
     [SerializeField]
     private GameObject _canvasPanel, _buttonPrefab;
     [SerializeField]
@@ -42,6 +43,7 @@ public class Inventory : MonoBehaviour
         {
             print("<color=green>" +gameObject.name +" found the item</color>");
             JuiceController.Instance.AnnounceArtefact(item);
+            ArtefactFound = true;
         }
 
         if (_canvasPanel != null)
@@ -75,7 +77,7 @@ public class Inventory : MonoBehaviour
         GameObject tmpButton = Instantiate(_buttonPrefab);
         tmpButton.GetComponent<Button>().onClick.AddListener(item.Use);
         tmpButton.GetComponent<Image>().sprite =
-            item.gameObject.GetComponent<SpriteRenderer>().sprite;
+            item.gameObject.transform.GetChild(0).GetComponent<SpriteRenderer>().sprite;
         tmpButton.name = item.name;
         tmpButton.transform.SetParent(_canvasPanel.transform);
         itemButtonDictionary.Add(item, tmpButton);

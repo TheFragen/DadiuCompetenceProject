@@ -249,10 +249,10 @@ public class Level_PreGenerate : Singleton<Level_PreGenerate>
             }
             Instantiate(element.Value.prefab, element.Key, Quaternion.identity);
         }
-
+        // Yields while all tiles get set up
+        yield return new WaitForEndOfFrame();
         print("<color=blue>Time of execution:</color> " + (Time.realtimeSinceStartup - startTime));
-        GameManager.Instance._LevelIsGenerated = true;
-        print(tileDict.Count);
+        GameManager.Instance.SetLevelGenerated();
         yield return null;  
     }
 

@@ -9,21 +9,20 @@ public class PathFinding : MonoBehaviour
     [SerializeField]
     private Grid _Grid;
 
+    private bool _LevelIsGenerated;
+
     [SerializeField]
     private Items _itemScriptableObject;
-
-    [SerializeField]
-    private float _WaitTime = .5f;
-    [SerializeField]
-    private bool _useDelay = false;
-
-    [SerializeField]
-    private bool _EveryFrame = false;
-
-    private bool _coroutineRunning = false;
-    private Vector3 _lastFramePos = Vector3.zero;
-
     private Dictionary<GameObject, List<Node>> _PathsActive = new Dictionary<GameObject, List<Node>>();
+
+    private void OnEnable()
+    {
+        GameManager.OnLevelGenerated += SetLevel;
+    }
+    private void OnDisable()
+    {
+        GameManager.OnLevelGenerated -= SetLevel;
+    }
 
     public bool IsInGrid(Vector3 nodePos) {
         if (_PathsActive == null) return false;
@@ -40,15 +39,6 @@ public class PathFinding : MonoBehaviour
         return false;
     }
 
-    void Update()
-    {
-     /*   if (_EveryFrame && (_Target.transform.position - _lastFramePos).magnitude > 1)
-        {
-            StartCoroutine(FindPathCoroutine(0));
-            _lastFramePos = _Target.transform.position;
-        }*/
-    }
-
     public void AddToActivePaths(GameObject go, List<Node> path)
     {
         _PathsActive.Add(go, path);
@@ -58,13 +48,18 @@ public class PathFinding : MonoBehaviour
         _PathsActive.Remove(go);
     }
 
+    void SetLevel()
+    {
+        _LevelIsGenerated = true;
+    }
+
     public List<Node> GeneratePath(Vector3 start, Vector3 target)
     {
         List<Node> path = new List<Node>();
 
         float startTime = Time.realtimeSinceStartup;
 
-        if (!GameManager.Instance._LevelIsGenerated)
+        if (!_LevelIsGenerated)
         {
             Debug.LogError("No level generated yet");
             return null;
@@ -85,8 +80,6 @@ public class PathFinding : MonoBehaviour
         if (startNode == null || targetNode == null) {
             return null;
         }
-
-        _coroutineRunning = true;
         open.Add(startNode);
         
         while (open.Count > 0) {
@@ -107,8 +100,7 @@ public class PathFinding : MonoBehaviour
             if (currentNode == targetNode) {
                 //print("Found the path dude");
                 path = Retrace(startNode, targetNode);
-                print("<color=green>Pathfinding:</color> Time of execution: " + (Time.realtimeSinceStartup - startTime));
-                _coroutineRunning = false;
+                //print("<color=green>Pathfinding:</color> Time of execution: " + (Time.realtimeSinceStartup - startTime));
                 return path;
             }
 
@@ -136,19 +128,6 @@ public class PathFinding : MonoBehaviour
         }
 
         return path;
-    }
-
-    [Button]
-    void FindPath()
-    {
-        if (_useDelay)
-        {
-            StartCoroutine(FindPathCoroutine(_WaitTime));
-        }
-        else
-        {
-            StartCoroutine(FindPathCoroutine(0));
-        }
     }
     
     IEnumerator FindPathCoroutine(float WaitTime)

@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Gamelogic.Extensions;
 using UnityEngine;
 
-public class Grid : MonoBehaviour
+public class Grid : Singleton<Grid>
 {
     public PathFinding _pathFinding;
 
@@ -118,6 +119,11 @@ public class Grid : MonoBehaviour
         }
 
         return neighbours;
+    }
+
+    public Dictionary<Vector3, Node> GetNodes()
+    {
+        return _Grid;
     }
 
     public void AddToGrid(Vector3 worldPos)

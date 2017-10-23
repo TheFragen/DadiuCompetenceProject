@@ -8,6 +8,23 @@ public class HumanMotor : MonoBehaviour
     public delegate void PickupItem(AbstractItem item);
     public event PickupItem OnItemPickup;
 
+    private bool _LevelIsGenerated;
+
+    private void OnEnable()
+    {
+        GameManager.OnLevelGenerated += SetLevel;
+    }
+
+    private void OnDisable()
+    {
+        GameManager.OnLevelGenerated -= SetLevel;
+    }
+
+    private void SetLevel()
+    {
+        _LevelIsGenerated = true;
+    }
+
     private void Start()
     {
         GameManager.Instance.CreatePlayer(gameObject);
@@ -62,7 +79,7 @@ public class HumanMotor : MonoBehaviour
 
     private void OnTriggerStay(Collider collider)
     {
-        if (!GameManager.Instance._LevelIsGenerated) return;
+        if (!_LevelIsGenerated) return;
         AbstractItem _tmp = collider.gameObject.GetComponent<AbstractItem>();
         if (_tmp == null) return;
 

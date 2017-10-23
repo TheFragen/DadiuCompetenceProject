@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using EasyButtons;
-using Gamelogic.Extensions;
-using Gamelogic.Extensions.Algorithms;
 using UnityEngine;
 
 [RequireComponent(typeof(HumanMotor))]
@@ -18,29 +16,47 @@ public class NaiveMovement : MonoBehaviour
 
     [SerializeField] private float _waitTime;
 
+    
     private Vector3 _targetPos = Vector3.negativeInfinity;
 
     private Vector3 nextNode;
     private Vector3 _lastFrameDirection;
+    private Inventory _inventory;
 
     private List<Vector3> blacklistedNodes;
     private bool _isMoving;
     private GameObject _itemToLookFor;
+    private bool _LevelIsGenerated;
+
+    void OnEnable()
+    {
+        GameManager.OnLevelGenerated += SetLevel;
+    }
+
+    void OnDisable() {
+        GameManager.OnLevelGenerated -= SetLevel;
+    }
 
     // Use this for initialization
     void Start()
     {
         _motor = GetComponent<HumanMotor>();
+        _inventory = GetComponent<Inventory>();
         blacklistedNodes = new List<Vector3>();
+    }
+
+    private void SetLevel()
+    {
+        _LevelIsGenerated = true;
     }
 
     void Update()
     {
-        if (!GameManager.Instance._LevelIsGenerated) return;
+        if (!_LevelIsGenerated) return;
         // Check if the AI has a path
         // If it has a path, do movement
         // If not find a path
-
+        
         if (_path == null || _path.Count == 0)
         {
             InitializePath();
@@ -70,6 +86,7 @@ public class NaiveMovement : MonoBehaviour
             else
             {
                // print("We don't have the technology");
+               print("Black listing");
                 blacklistedNodes.Add(_itemToLookFor.transform.position);
                 _itemToLookFor = null;
             }
@@ -132,28 +149,28 @@ public class NaiveMovement : MonoBehaviour
 
     private GameObject FindClosestItem()
     {
-        /*  var spawnedItems = GameManager.Instance.GetSpawnedItems()
+         var spawnedItems = GameManager.Instance.GetSpawnedItems()
               .Where(o => o.gameObject.activeInHierarchy)
               .Where(o => !blacklistedNodes.Contains(o.transform.position))
               .OrderBy(o => (o.transform.position - transform.position).sqrMagnitude)
-              .Take(10);
-          _itemToLookFor = spawnedItems.RandomItem();*/
-        float minDistance = float.MaxValue;
-        GameObject itemToLookfor = null;
-        foreach (var item in GameManager.Instance.GetSpawnedItems())
-        {
-            if (!item.gameObject.activeInHierarchy) continue;
-            if (blacklistedNodes.Contains(item.gameObject.transform.position))
-                continue;
-
-            Vector3 direction = transform.position - item.transform.position;
-            if (direction.sqrMagnitude < minDistance)
-            {
-                itemToLookfor = item.gameObject;
-                minDistance = direction.sqrMagnitude;
-            }
-        }
-        return itemToLookfor;
+              .Take(10).ToList();
+        return spawnedItems[Random.Range(0, spawnedItems.Count)];
+        /*  float minDistance = float.MaxValue;
+          GameObject itemToLookfor = null;
+          foreach (var item in GameManager.Instance.GetSpawnedItems())
+          {
+              if (!item.gameObject.activeInHierarchy) continue;
+              if (blacklistedNodes.Contains(item.gameObject.transform.position))
+                  continue;
+  
+              Vector3 direction = transform.position - item.transform.position;
+              if (direction.sqrMagnitude < minDistance)
+              {
+                  itemToLookfor = item.gameObject;
+                  minDistance = direction.sqrMagnitude;
+              }
+          }
+          return itemToLookfor;*/
     }
 
     private void OnDrawGizmos()
