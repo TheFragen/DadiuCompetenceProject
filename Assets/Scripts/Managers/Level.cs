@@ -18,7 +18,7 @@ public class Level : MonoBehaviour
 	// Use this for initialization
 	void Start()
 	{
-		_playersAndAi = GameObject.FindGameObjectsWithTag("Player");
+		_playersAndAi = GameObject.FindGameObjectsWithTag("Player").Concat(GameObject.FindGameObjectsWithTag("AI")).ToArray();
 		_playersAndAiPrevFrame =
 			new Dictionary<GameObject, KeyValuePair<Vector3, GameObject>>();
 	}

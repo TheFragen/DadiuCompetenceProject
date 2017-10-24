@@ -39,7 +39,7 @@ public class Inventory : MonoBehaviour
         _Inventory.Add(item);
         GameManager.Instance.RemoveSpawnedItem(item.gameObject);
 
-        if (_ArtefactToFind.name.Equals(item.name))
+        if (_ArtefactToFind.itemName.Equals(item.itemName))
         {
             print("<color=green>" +gameObject.name +" found the item</color>");
             JuiceController.Instance.AnnounceArtefact(item, null);
@@ -59,6 +59,11 @@ public class Inventory : MonoBehaviour
 
     public void RemoveItem(AbstractItem item)
     {
+        // Check if the item has already been removed - such as in a foreach loop
+        if (!_Inventory.Contains(item))
+        {
+            return;
+        }
         _Inventory.Remove(item);
         if (_canvasPanel != null)
         {
@@ -89,7 +94,7 @@ public class Inventory : MonoBehaviour
         GameObject tmpButton = Instantiate(_buttonPrefab);
         tmpButton.GetComponent<Button>().onClick.AddListener(item.Use);
         tmpButton.GetComponent<Image>().sprite = item.sprite;
-        tmpButton.name = item.name;
+        tmpButton.name = item.itemName;
         tmpButton.transform.SetParent(_canvasPanel.transform);
         itemButtonDictionary.Add(item, tmpButton);
     }

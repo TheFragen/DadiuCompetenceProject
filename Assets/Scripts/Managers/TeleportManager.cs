@@ -100,6 +100,16 @@ public class TeleportManager : Singleton<TeleportManager>
     public void AITeleport(GameObject AI)
     {
         //TODO: Implement teleport for AI
-        print("Missing AI teleport implementation");
+      /*  MovingState ai = AI.GetComponent<MovingState>();
+        if (ai == null)
+        {
+            print("AI not in moving state");
+            return;
+        }
+        List<Node> currentPath = ai.GetPath();
+        if (currentPath != null && currentPath.Count > 0)
+        {
+            
+        }*/
     }
 }

@@ -75,6 +75,7 @@ public class PathFinding : MonoBehaviour
             Debug.LogError("StartNode is null");
         }
         if (targetNode == null) {
+            print("TargetNode is null");
             Debug.LogError("TargetNode is null");
         }
         if (startNode == null || targetNode == null) {
@@ -126,7 +127,6 @@ public class PathFinding : MonoBehaviour
                 }
             }
         }
-
         return path;
     }
     

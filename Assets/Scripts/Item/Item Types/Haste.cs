@@ -8,6 +8,6 @@ public class Haste : AbstractItem
     {
         base.Use();
         GameManager.Instance.IncreaseAction(owner, 2);
-        JuiceController.Instance.SetItemUsedText(name +" used.");
+        JuiceController.Instance.SetItemUsedText(itemName +" used.");
     }
 }

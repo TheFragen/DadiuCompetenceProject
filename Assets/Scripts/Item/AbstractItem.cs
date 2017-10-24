@@ -5,7 +5,7 @@ using UnityEngine;
 [System.Serializable]
 public class AbstractItem : MonoBehaviour
 {
-    public string name;
+    public string itemName;
     public bool isArtefact;
     public bool isIdentified;
 
@@ -26,7 +26,7 @@ public class AbstractItem : MonoBehaviour
     {
         if (!isArtefact)
         {
-            Debug.Log("Used item: " + name);
+            Debug.Log("Used item: " + itemName);
             owner.GetComponent<Inventory>().RemoveItem(this);
         }
     }

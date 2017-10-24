@@ -18,6 +18,7 @@ public class AI : MonoBehaviour
     [HideInInspector]
     public List<GameObject> _BlacklsitedNodes;
     private State _currentState;
+    
 
     private void OnEnable()
     {

@@ -26,9 +26,6 @@ public class Level_PreGenerate : Singleton<Level_PreGenerate>
     [SerializeField]
     private Dictionary<Vector3, Tile> tileDict;
 
-    [SerializeField]
-    private int tileCount = 0;
-
     private List<GameObject> possibleTilesUp;
     private List<GameObject> possibleTilesRight;
     private List<GameObject> possibleTilesDown;
@@ -236,15 +233,11 @@ public class Level_PreGenerate : Singleton<Level_PreGenerate>
             {
                 yield return new WaitForSeconds(delayTime);
             }
-            
-            tileCount++;
         }
-        print("Spawning objects");
         foreach (var element in tileDict)
         {
             if (element.Value.prefab == null)
             {
-                print("Skipping: " +element.Value.transform.gameObject.name);
                 continue;
             }
             Instantiate(element.Value.prefab, element.Key, Quaternion.identity);

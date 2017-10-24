@@ -94,7 +94,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a57e7e8c28d5ee94a98640088c8a7f56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  name: Scroll of Teleportation
+  itemName: Scroll of Teleportation
   isArtefact: 0
   isIdentified: 0
   owner: {fileID: 0}

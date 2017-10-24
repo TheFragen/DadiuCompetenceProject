@@ -26,7 +26,6 @@ public class SearchingState : State
     void InitializePath()
     {
         _ai._ItemToLookFor = FindClosestItem();
-        Debug.Log("Item to look for: " + _ai._ItemToLookFor);
     }
 
     private GameObject FindClosestItem()
@@ -42,7 +41,6 @@ public class SearchingState : State
                 _ai._PathFinding.GeneratePath(_ai.transform.position,
                     o.transform.position).Count)
             .Take(5).ToList();
-        Debug.Log("Spawned items: " + spawnedItems.Count);
         if (spawnedItems.Count == 0)
         {
             _ai.SetState(new IdleState(_ai));

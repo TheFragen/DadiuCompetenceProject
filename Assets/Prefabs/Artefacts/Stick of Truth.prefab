@@ -94,11 +94,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dca71468211dbf5418f6b95bdbf97299, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  name: The Stick of Truth
+  itemName: Stick of Truth
   isArtefact: 1
   isIdentified: 0
   owner: {fileID: 0}
-  sprite: {fileID: 0}
+  sprite: {fileID: 21300000, guid: d25970b26ebb3d843bc26ab88bbbb20e, type: 3}
 --- !u!212 &212534904307756818
 SpriteRenderer:
   m_ObjectHideFlags: 1

@@ -93,4 +93,14 @@ public class MovingState : State
         yield return null;
         _isMoving = false;
     }
+
+    public int GetPathIndex()
+    {
+        return _pathIndex;
+    }
+
+    public List<Node> GetPath()
+    {
+        return _path;
+    }
 }

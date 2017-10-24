@@ -35,6 +35,7 @@ public class GameManager : Singleton<GameManager>
         _activePlayerText = _activePlayerCanvas.GetComponent<Text>();
         SetupArtefacts();
         NextTurn(null);
+        Level_PreGenerate.Instance.GenerateMaze();
     }
     
     void Update()
@@ -76,7 +77,7 @@ public class GameManager : Singleton<GameManager>
             AbstractItem randomArtefact = items[Random.Range(0, items.Count)];
             player.GetComponent<Inventory>().SetArtefact(randomArtefact);
             items.Remove(randomArtefact);
-            if (player.name.ToUpper().Equals("PLAYER"))
+            if (player.tag == "Player" || player.tag == "AI")
             {
                 JuiceController.Instance.SetNeededArtefact(randomArtefact);
             }
@@ -131,6 +132,7 @@ public class GameManager : Singleton<GameManager>
             if (_activePlayerActions > 0)
             {
                 _activePlayerActions--;
+                JuiceController.instance.SetActionsLeft(_activePlayerActions);
                 return true;
             }
             return false;
@@ -143,15 +145,26 @@ public class GameManager : Singleton<GameManager>
         if (player == _activePlayer)
         {
             _activePlayerActions += amount;
+            JuiceController.instance.SetActionsLeft(_activePlayerActions);
             return true;
         }
         return false;
     }
 
+    public void RemoveAllItems(GameObject player)
+    {
+        Inventory inventoryComponent = player.GetComponent<Inventory>();
+        List<AbstractItem> inventory = new List<AbstractItem>(inventoryComponent.GetInventory());
+        foreach (var item in inventory)
+        {
+            inventoryComponent.RemoveItem(item);
+        }
+        inventoryComponent.ArtefactFound = false;
+    }
+
     public void NextTurn(GameObject player)
     {
         if (player != _activePlayer) return;
-        JuiceController.instance.SetEndTurnButton(null);
         _activePlayer = null;
         _turnIndex++;
         if (_turnIndex == _players.Count) {
@@ -167,6 +180,7 @@ public class GameManager : Singleton<GameManager>
         _activePlayer = _players[_turnIndex];
         _activePlayerActions = _playerActions;
         JuiceController.instance.SetEndTurnButton(_activePlayer);
+        JuiceController.instance.SetActionsLeft(_activePlayerActions);
         _activePlayerText.text = _activePlayer.name + " is playing his turn.";
     }
 }

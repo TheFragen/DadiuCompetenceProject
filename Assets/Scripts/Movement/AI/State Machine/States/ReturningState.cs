@@ -19,6 +19,10 @@ public class ReturningState : State
 
     public override void Tick()
     {
+        if (!_ai._Inventory.ArtefactFound)
+        {
+            _ai.SetState(new SearchingState(_ai));
+        }
         if (!_isMoving && GameManager.Instance.IsPlayerTurn(_ai.gameObject)) {
             _ai.StartCoroutine(PerformMovement(_ai._WaitTime));
         }

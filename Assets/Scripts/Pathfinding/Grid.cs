@@ -154,35 +154,26 @@ public class Grid : Singleton<Grid>
                 hit.transform.tag == "Maze Tile")
             {
                 tilePos = hit.transform.position;
-               // print("Tile: " + tilePos);
             }
         }
         else
         {
             return FindClosestNode(worldPos);
         }
-
-       // print("World pos: " + worldPos);
-
-        // Snap worldPos to nearest nodePos
+        
         Vector3 normalizedPos = worldPos - tilePos;
-       // print("Normalized pos (before round): " + normalizedPos);
         normalizedPos.x = Mathf.Round(normalizedPos.x);
         normalizedPos.z = Mathf.Round(normalizedPos.z);
-      //  print("Normalized pos (after round): " + normalizedPos);
 
         Vector3 nodePos = tilePos + normalizedPos;
         nodePos.y = 0;
-        //  print("Node pos: " + nodePos);
 
         Node n;
         _Grid.TryGetValue(nodePos, out n);
-        //print("Found node: " +n);
-
         // No node found, find the closest node to this position
         if (n == null)
         {
-            n = FindClosestNode(worldPos);
+            return FindClosestNode(worldPos);
         }
 
         return n;
@@ -190,12 +181,15 @@ public class Grid : Singleton<Grid>
 
     private Node FindClosestNode(Vector3 worldPos)
     {
-        float minDist = float.MaxValue;
+        float minDist = Mathf.Infinity;
         Node closestNode = null;
         
-        foreach (KeyValuePair<Vector3, Node> pos in _Grid) {
-            if ((worldPos - pos.Key).sqrMagnitude < minDist) {
-                minDist = (worldPos - pos.Key).sqrMagnitude;
+        foreach (KeyValuePair<Vector3, Node> pos in _Grid)
+        {
+            float dist = (worldPos - pos.Value._WorldPos).sqrMagnitude;
+            if (dist < minDist)
+            {
+                minDist = dist;
                 closestNode = pos.Value;
             }
         }

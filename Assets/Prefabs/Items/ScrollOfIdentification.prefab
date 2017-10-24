@@ -94,9 +94,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef8a77555b601c442ab815754c182df8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  name: Scroll of Identification
+  itemName: Scroll of Identification
   isArtefact: 0
+  isIdentified: 0
   owner: {fileID: 0}
+  sprite: {fileID: 0}
 --- !u!212 &212703551527222796
 SpriteRenderer:
   m_ObjectHideFlags: 1

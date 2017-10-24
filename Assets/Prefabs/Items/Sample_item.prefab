@@ -94,9 +94,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36a443ea58eb7814f8a17654b0900898, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  name: Cogwheel of Testing
+  itemName: Cogwheel of Testing
   isArtefact: 0
+  isIdentified: 0
   owner: {fileID: 0}
+  sprite: {fileID: 0}
 --- !u!212 &212387819964334466
 SpriteRenderer:
   m_ObjectHideFlags: 1

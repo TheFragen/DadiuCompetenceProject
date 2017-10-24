@@ -41,7 +41,7 @@ public class Tile : MonoBehaviour
             foreach (var rend in gameObject
                 .GetComponentsInChildren<Renderer>())
             {
-                 rend.enabled = false;
+             //    rend.enabled = false;
             }
         }
     }

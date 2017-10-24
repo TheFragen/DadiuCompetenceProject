@@ -94,7 +94,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c9184a871e691b4aae9248e837fcf57, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  name: Haste
+  itemName: Haste
   isArtefact: 0
   isIdentified: 0
   owner: {fileID: 0}
