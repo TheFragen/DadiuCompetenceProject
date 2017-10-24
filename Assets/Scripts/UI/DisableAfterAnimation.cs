@@ -11,9 +11,14 @@ public class DisableAfterAnimation : MonoBehaviour
     }
     public void DisableMe()
     {
-        bool isEnemy = _animator.GetBool("IsEnemy");
-        JuiceController.Instance.SetupBattle(isEnemy);
-        JuiceController.Instance.CombatSubtract(isEnemy);
-        gameObject.SetActive(false);
+        if (GetComponent<Animator>().enabled)
+        {
+            print("Subtracting");
+            bool isEnemy = _animator.GetBool("IsEnemy");
+            JuiceController.Instance.SetupBattle(isEnemy);
+            JuiceController.Instance.CombatSubtract(isEnemy);
+            gameObject.SetActive(false);
+        }
+        
     }
 }

@@ -58,7 +58,6 @@ public class JuiceController : Singleton<JuiceController>
 
     private int enemyLives;
     private int playerLives;
-    private int activePlayer;
     private GameObject combatPlayer;
     private GameObject combatOpponent;
     private bool InCombat;
@@ -280,9 +279,9 @@ public class JuiceController : Singleton<JuiceController>
         InCombat = true;
 
         _WinPanel.SetActive(false);
+        FightCanvasAnimator.enabled = true;
         FightCanvas.SetActive(true);
         StartCombatButton.gameObject.SetActive(false);
-        activePlayer = -1;
         FightTextObject.GetComponent<ScrollingText>().SetText(FightText,
             delegate
             {
@@ -290,6 +289,10 @@ public class JuiceController : Singleton<JuiceController>
             });
         SetStateOnList(NonFightObjects, false);
         DiceAnimator.gameObject.SetActive(false);
+
+        DiceAnimator.enabled = true;
+        DiceAnimator.gameObject.GetComponent<Image>().enabled = true;
+
         enemyLives = 10;
         playerLives = 10;
         StartCoroutine(CombatUpdate());
@@ -314,12 +317,14 @@ public class JuiceController : Singleton<JuiceController>
             PlayerHealthObject.text = "Health: " + playerLives;
             OpponentHealthObject.text = "Health: " + enemyLives;
 
-            if (enemyLives <= 0) {
-                EndCombat(false);
+            if (enemyLives <= 0)
+            {
+                EndCombatWithText();
                 break;
             }
-            if (playerLives <= 0) {
-                EndCombat(false);
+            if (playerLives <= 0)
+            {
+                EndCombatWithText();
                 break;
             }
             yield return new WaitForEndOfFrame();
@@ -358,6 +363,35 @@ public class JuiceController : Singleton<JuiceController>
             
         }
         
+    }
+
+    private void EndCombatWithText()
+    {
+        StopCoroutine(CombatUpdate());
+        DiceAnimator.enabled = false;
+        DiceAnimator.StopPlayback();
+        DiceAnimator.gameObject.SetActive(false);
+        DiceAnimator.gameObject.GetComponent<Image>().enabled = false;
+        FightCanvasAnimator.enabled = false;
+        FightOptionsObject.SetActive(false);
+
+        // Play sound
+
+        List<string> endText = new List<string>();
+        if (playerLives <= 0)
+        {
+            endText.Add("The opponent has won the fight.");
+            endText.Add(
+                "You have been returned to Tristam, and lost all your items.");
+        }
+        else if (enemyLives <= 0)
+        {
+            endText.Add("Congratulations, you've won the fight.");
+            endText.Add("Your opponent has been stripped of his items and cast back to Tristam.");
+        }
+        List<string> endTextList = new List<string>();
+        FightTextObject.GetComponent<ScrollingText>().SetText(endText,
+            delegate { EndCombat(false); });
     }
 
     public void EndCombat(bool isRunning)

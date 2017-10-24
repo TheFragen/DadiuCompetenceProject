@@ -6,7 +6,9 @@ public class FollowPlayer : MonoBehaviour
 {
 	[SerializeField]
 	private float damping = 0.2f;
-	[SerializeField]
+    [SerializeField]
+    private Vector3 _offset;
+    [SerializeField]
 	private GameObject _player;
 	private Vector3 currentVelocity;
 	private Vector3 initialOffset;

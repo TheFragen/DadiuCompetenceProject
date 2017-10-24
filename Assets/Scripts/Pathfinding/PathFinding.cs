@@ -78,6 +78,7 @@ public class PathFinding : MonoBehaviour
             print("TargetNode is null");
             Debug.LogError("TargetNode is null");
         }
+        print("Creating path");
         if (startNode == null || targetNode == null) {
             return null;
         }
@@ -101,6 +102,7 @@ public class PathFinding : MonoBehaviour
             if (currentNode == targetNode) {
                 //print("Found the path dude");
                 path = Retrace(startNode, targetNode);
+                print("In returning: " + path.Count);
                 //print("<color=green>Pathfinding:</color> Time of execution: " + (Time.realtimeSinceStartup - startTime));
                 return path;
             }
@@ -127,6 +129,7 @@ public class PathFinding : MonoBehaviour
                 }
             }
         }
+        print("Out returning: " +path.Count);
         return path;
     }
     

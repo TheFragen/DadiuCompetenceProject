@@ -10,9 +10,9 @@ public class ScrollingText : MonoBehaviour
     private List<string> _scrollingText;
     private UnityAction _scrollingCallback;
     
-    private int _scrollIndex;
     private bool _componentClicked;
 
+    // Gets called from the PokemonAnimation as an animator event
     public void AnimationStart()
     {
         StartCoroutine(StartScrolling(_scrollingText, _scrollingCallback));
@@ -26,15 +26,13 @@ public class ScrollingText : MonoBehaviour
             string final = "";
             for (int j = 0; j < words.Length; j++)
             {
-                if (j == 0)
+                // Fix for Coroutines not beeing called properly when in an animation
+                if (words[j].Equals("ø"))
                 {
-                    final = words[j];
+                    words[j] = "";
                 }
-                else
-                {
-                    final += " " + words[j];
-                }
-                _textComponent.text = final;
+                final += " " + words[j];
+                _textComponent.text = final.Trim();
                 yield return new WaitForSeconds(1/24f);
             }
             while (!_componentClicked)
@@ -57,7 +55,8 @@ public class ScrollingText : MonoBehaviour
 
     public void SetText(List<string> text, UnityAction callback)
     {
-        _scrollIndex = 0;
+        _scrollingText = text;
+        _scrollingCallback = callback;
         _textComponent = GetComponent<Text>();
         if (_scrollingText != null) {
             StartCoroutine(StartScrolling(_scrollingText, _scrollingCallback));

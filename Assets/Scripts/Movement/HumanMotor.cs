@@ -8,7 +8,7 @@ public class HumanMotor : MonoBehaviour
     public delegate void PickupItem(AbstractItem item);
     public event PickupItem OnItemPickup;
 
-    private bool _LevelIsGenerated;
+   // private bool _LevelIsGenerated;
 
     private void OnEnable()
     {
@@ -22,7 +22,7 @@ public class HumanMotor : MonoBehaviour
 
     private void SetLevel()
     {
-        _LevelIsGenerated = true;
+      //  _LevelIsGenerated = true;
     }
 
     private void Start()

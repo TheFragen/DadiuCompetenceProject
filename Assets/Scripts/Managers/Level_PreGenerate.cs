@@ -139,35 +139,29 @@ public class Level_PreGenerate : Singleton<Level_PreGenerate>
 
             // Filter out tiles that are blocked in the direction we want to go
             List<GameObject> possibleTiles = new List<GameObject>();
-            string dirLiteral = "";
             switch (direction)
             {
                 case 0:
                     // Up
                     dirVector = new Vector3(0, 0, 1);
-                    dirLiteral = "Up";
                     possibleTiles = new List<GameObject>(possibleTilesUp);
                     break;
                 case 1:
                     // Right
                     dirVector = new Vector3(1, 0, 0);
-                    dirLiteral = "Right";
                     possibleTiles = new List<GameObject>(possibleTilesRight);
                     break;
                 case 2:
                     // Down
                     dirVector = new Vector3(0, 0, -1);
-                    dirLiteral = "Down";
                     possibleTiles = new List<GameObject>(possibleTilesDown);
                     break;
                 case 3:
                     // Left
                     dirVector = new Vector3(-1, 0, 0);
-                    dirLiteral = "Left";
                     possibleTiles = new List<GameObject>(possibleTilesLeft);
                     break;
             }
-          //  print("Direction: " + dirLiteral);
 
             Vector3 nextTilePos = position + dirVector * 3;
             // Up
