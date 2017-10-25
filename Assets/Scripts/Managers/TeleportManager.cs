@@ -38,7 +38,10 @@ public class TeleportManager : Singleton<TeleportManager>
     // Update is called once per frame
     void Update()
     {
-        if (!_LevelIsCreated || _PlayerInUse == null) return;
+        if (!_LevelIsCreated || _PlayerInUse == null)
+        {
+            return;
+        }
         _SelectionCube.SetActive(true);
         FindNodePos();
     }

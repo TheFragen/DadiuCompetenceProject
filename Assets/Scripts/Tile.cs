@@ -55,16 +55,16 @@ public class Tile : MonoBehaviour
 
         float xSpacing = width / _gridSize;
         float ySpacing = height / _gridSize;
-
-        for (int y = 0; y < _gridSize; y++)
+        
+        for (int y = 0, tilePos = 0; y < _gridSize; y++)
         {
-            for (int x = 0; x < _gridSize; x++)
+            for (int x = 0; x < _gridSize; x++, tilePos++)
             {
                 Vector3 pos = transform.position;
                 pos.x = pos.x - width / 2 + x * xSpacing + xSpacing / 2;
                 pos.z = pos.z - height / 2 + y * ySpacing + ySpacing / 2;
 
-                _Grid.AddToGrid(pos);
+                _Grid.AddToGrid(pos, this, tilePos);
                 spawnPositions.Add(pos);
             }
         }

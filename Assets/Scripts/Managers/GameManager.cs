@@ -9,16 +9,13 @@ using UnityEngine.UI;
 
 public class GameManager : Singleton<GameManager>
 {
-  //  public bool _LevelIsGenerated = false;
     public delegate void LevelGenerated();
     public static event LevelGenerated OnLevelGenerated;
 
     [SerializeField]
     private Items _ItemScriptableObject;
     [SerializeField]
-    private List<GameObject> _players = new List<GameObject>();
-    [SerializeField]
-    private List<GameObject> _spawnedItems = new List<GameObject>();
+    private List<GameObject> _players, _spawnedItems = new List<GameObject>();
     [SerializeField]
     private GameObject _activePlayer, _activePlayerCanvas;
 
@@ -110,7 +107,8 @@ public class GameManager : Singleton<GameManager>
 
     public bool IsPlayerTurn(GameObject player)
     {
-        if (_turnHacks) {
+        if (_turnHacks)
+        {
             return true;
         }
         return _activePlayer == player;
@@ -164,10 +162,14 @@ public class GameManager : Singleton<GameManager>
 
     public void NextTurn(GameObject player)
     {
-        if (player != _activePlayer) return;
+        if (player != _activePlayer)
+        {
+            return;
+        }
         _activePlayer = null;
         _turnIndex++;
-        if (_turnIndex == _players.Count) {
+        if (_turnIndex == _players.Count)
+        {
             _turnIndex = 0;
         }
         Camera.main.GetComponent<FollowPlayer>().SetPlayer(_players[_turnIndex]);

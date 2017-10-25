@@ -5,16 +5,16 @@ using UnityEngine.EventSystems;
 
 #pragma warning disable 649
 [RequireComponent(typeof(HumanMotor))]
-public class PlayerInput : MonoBehaviour {
+public class PlayerInput : MonoBehaviour
+{
     [SerializeField]
-    private float _MovementDebounce;
+    private float _movementDebounce;
+    [SerializeField]
+    private bool _hoveringUi;
 
     private Camera _camera;
 	private HumanMotor _motor;
-    private float _lastTime = 0;
-
-    [SerializeField]
-    private bool _hoveringUI;
+    private float _lastClickTime = 0;
 
     void Start ()
 	{
@@ -24,21 +24,21 @@ public class PlayerInput : MonoBehaviour {
 	
 	void Update ()
 	{
-		if (Input.GetMouseButton(0) && Time.time > _lastTime + _MovementDebounce)
+		if (Input.GetMouseButton(0) && Time.time > _lastClickTime + _movementDebounce)
 		{
             OnMouseClick();
-		    _lastTime = Time.time;
+		    _lastClickTime = Time.time;
 		}
 	}
 
     public void SetHovering()
     {
-        _hoveringUI = !_hoveringUI;
+        _hoveringUi = !_hoveringUi;
     }
 
     void OnMouseClick()
 	{
-	    if (_hoveringUI)
+	    if (_hoveringUi)
 	    {
 	        return;
 	    }

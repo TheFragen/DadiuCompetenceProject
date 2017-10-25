@@ -34,14 +34,12 @@ public class Inventory : MonoBehaviour
 
     void PickupItem(AbstractItem item)
     {
-        print("Received event.");
         item.owner = gameObject;
         _Inventory.Add(item);
         GameManager.Instance.RemoveSpawnedItem(item.gameObject);
 
         if (_ArtefactToFind.itemName.Equals(item.itemName))
         {
-            print("<color=green>" +gameObject.name +" found the item</color>");
             JuiceController.Instance.AnnounceArtefact(item, null);
             ArtefactFound = true;
         }

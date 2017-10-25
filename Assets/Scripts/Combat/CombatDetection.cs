@@ -7,28 +7,28 @@ public class CombatDetection : MonoBehaviour
     [SerializeField]
     private float maxDistance = 2;
 
-    private bool isShowingButton;
-    private GameObject activeOpponent;
+    private bool _isShowingButton;
+    private GameObject _activeOpponent;
 
     void OnTriggerStay(Collider other)
     {
         float dist = (transform.position - other.transform.position)
             .sqrMagnitude;
 
-        if (other.gameObject == activeOpponent && dist > maxDistance &&
-            isShowingButton)
+        if (other.gameObject == _activeOpponent && dist > maxDistance &&
+            _isShowingButton)
         {
             JuiceController.Instance.DisableCombat();
-            isShowingButton = false;
-            activeOpponent = null;
+            _isShowingButton = false;
+            _activeOpponent = null;
         }
         else if ((other.tag == "AI" || other.tag == "Player") &&
                  dist < maxDistance &&
                  GameManager.Instance.IsPlayerTurn(gameObject))
         {
             JuiceController.Instance.EnableCombat(gameObject, other.gameObject);
-            isShowingButton = true;
-            activeOpponent = other.gameObject;
+            _isShowingButton = true;
+            _activeOpponent = other.gameObject;
         }
     }
 
@@ -36,8 +36,8 @@ public class CombatDetection : MonoBehaviour
     {
         if (other.tag == "AI" || other.tag == "Player") {
             JuiceController.Instance.DisableCombat();
-            isShowingButton = false;
-            activeOpponent = null;
+            _isShowingButton = false;
+            _activeOpponent = null;
         }
     }
 }

@@ -69,7 +69,6 @@ public class Level_PreGenerate : Singleton<Level_PreGenerate>
     public void GenerateMaze() {
         _spawnedTiles = new List<GameObject> { _spawningObject };
         StartCoroutine(GenerateMaceDelay(0));
-        //GenerateMaceDelay(0);
     }
 
     public void GenerateWithDelay()
@@ -84,8 +83,6 @@ public class Level_PreGenerate : Singleton<Level_PreGenerate>
         {
             { _spawningObject.transform.position, _spawningObject.GetComponent<Tile>() }
         };
-        // tiles = new GameObject[_numTilesToSpawn+1, _numTilesToSpawn+1];
-        // tiles[_numTilesToSpawn+1/2, _numTilesToSpawn+1/2] = _spawningObject;
 
         float startTime = Time.realtimeSinceStartup;
 
@@ -169,7 +166,6 @@ public class Level_PreGenerate : Singleton<Level_PreGenerate>
             tileDict.TryGetValue(nextTilePos + Vector3.forward * 3, out northTile);
             if (northTile != null && northTile.BlockedDown)
             {
-            //    print("Removed");
                 possibleTiles.RemoveAll(o => !o.GetComponent<Tile>().BlockedUp);
             }
             // Right
@@ -177,7 +173,6 @@ public class Level_PreGenerate : Singleton<Level_PreGenerate>
             tileDict.TryGetValue(nextTilePos + Vector3.right * 3, out eastTile);
             if (eastTile != null && eastTile.BlockedLeft)
             {
-             //   print("Removed");
                 possibleTiles.RemoveAll(o => !o.GetComponent<Tile>().BlockedRight);
             }
             // Down
@@ -185,7 +180,6 @@ public class Level_PreGenerate : Singleton<Level_PreGenerate>
             tileDict.TryGetValue(nextTilePos + Vector3.back * 3, out southTile);
             if (southTile != null && southTile.BlockedUp)
             {
-          //      print("Removed");
                 possibleTiles.RemoveAll(o => !o.GetComponent<Tile>().BlockedDown);
             }
             // Left
@@ -193,7 +187,6 @@ public class Level_PreGenerate : Singleton<Level_PreGenerate>
             tileDict.TryGetValue(nextTilePos + Vector3.left * 3, out westTile);
             if (westTile != null && westTile.BlockedRight)
             {
-           //     print("Removed");
                 possibleTiles.RemoveAll(o => !o.GetComponent<Tile>().BlockedLeft);
             }
 
@@ -207,15 +200,11 @@ public class Level_PreGenerate : Singleton<Level_PreGenerate>
                 }
                 lastObject = tileDict.ElementAt(tileDict.Count - 1 - checks).Key;
                 lastTile = tileDict.ElementAt(tileDict.Count - 1 - checks).Value;
-                checks--;
                 i--;
-             //   print("Possibletiles = 0");
                 checks++;
-              //  yield return null;
                 continue;
             }
             checks = 0;
-          //  print("Num possible tiles: " +possibleTiles.Count);
             GameObject chosenTile =
                 possibleTiles[Random.Range(0, possibleTiles.Count)];
             Vector3 newPos = position + dirVector * 3;

@@ -25,7 +25,7 @@ public class MovingState : State
         }
         else
         {
-            Debug.Log("Blacklisting: " +_ai._ItemToLookFor.name);
+        //    Debug.Log("Blacklisting: " +_ai._ItemToLookFor.name);
             _ai.SetState(new SearchingState(_ai));
             _ai._BlacklsitedNodes.Add(_ai._ItemToLookFor);
 
@@ -74,7 +74,7 @@ public class MovingState : State
             }
             else
             {
-                if (_ai._Inventory.ArtefactFound)
+                if (_ai._Inventory.ArtefactFound && !_ai._ContiniouslySearchAndMove)
                 {
                     _ai.SetState(new ReturningState(_ai));
                 }

@@ -5,13 +5,12 @@ using UnityEngine;
 
 public class Grid : Singleton<Grid>
 {
-    public PathFinding _pathFinding;
+    public PathFinding _PathFinding;
 
     [SerializeField]
     private Items _itemScriptableObject;
 
     private Dictionary<Vector3, Node> _Grid;
-    private Vector3 _testPos;
 
     private void Awake()
     {
@@ -21,24 +20,16 @@ public class Grid : Singleton<Grid>
     public List<Node> GetNeighbours(Node node)
     {
         List<Node> neighbours = new List<Node>();
-        Dictionary<Vector3, Tile> tileDict =
-            Level_PreGenerate.Instance.GetTileDictionary();
-        int layerMask = 1 << 8;
-        layerMask = ~layerMask;
 
         // North
         Node north;
-        _Grid.TryGetValue(node._WorldPos + Vector3.forward, out north);
-        if (north != null &&
-            !Physics.CheckSphere(node._WorldPos + new Vector3(0, .5f, .5f), .1f,
-                layerMask))
+        _Grid.TryGetValue(node._WorldPos + new Vector3(0, 0, 1), out north);
+        if (north != null && node._TileIndex != 6 && node._TileIndex != 8)
         {
-            Tile nTile;
-            tileDict.TryGetValue(north._WorldPos + new Vector3(0, 0, 1),
-                out nTile);
-            if (nTile != null)
+            if (node._TileIndex == 7)
             {
-                if (!nTile.BlockedDown)
+                if (!north._ParentTile.BlockedDown &&
+                    !node._ParentTile.BlockedUp)
                 {
                     neighbours.Add(north);
                 }
@@ -52,16 +43,12 @@ public class Grid : Singleton<Grid>
         // East
         Node east;
         _Grid.TryGetValue(node._WorldPos + Vector3.right, out east);
-        if (east != null &&
-            !Physics.CheckSphere(node._WorldPos + new Vector3(.5f, .5f, 0), .1f,
-                layerMask))
+        if (east != null && node._TileIndex != 8 && node._TileIndex != 2)
         {
-            Tile nTile;
-            tileDict.TryGetValue(east._WorldPos + new Vector3(1, 0, 0),
-                out nTile);
-            if (nTile != null)
+            if (node._TileIndex == 5)
             {
-                if (!nTile.BlockedLeft)
+                if (!node._ParentTile.BlockedRight &&
+                    !east._ParentTile.BlockedLeft)
                 {
                     neighbours.Add(east);
                 }
@@ -75,16 +62,11 @@ public class Grid : Singleton<Grid>
         // South
         Node south;
         _Grid.TryGetValue(node._WorldPos + Vector3.back, out south);
-        if (south != null &&
-            !Physics.CheckSphere(node._WorldPos + new Vector3(0, .5f, -.5f),
-                .1f, layerMask))
+        if (south != null && node._TileIndex != 0 && node._TileIndex != 2)
         {
-            Tile nTile;
-            tileDict.TryGetValue(south._WorldPos + new Vector3(0, 0, -1),
-                out nTile);
-            if (nTile != null)
+            if (node._TileIndex == 1)
             {
-                if (!nTile.BlockedUp)
+                if (!node._ParentTile.BlockedDown && !south._ParentTile.BlockedUp)
                 {
                     neighbours.Add(south);
                 }
@@ -98,16 +80,11 @@ public class Grid : Singleton<Grid>
         // West
         Node west;
         _Grid.TryGetValue(node._WorldPos + Vector3.left, out west);
-        if (west != null &&
-            !Physics.CheckSphere(node._WorldPos + new Vector3(-.5f, .5f, 0),
-                .1f, layerMask))
+        if (west != null && node._TileIndex != 6 && node._TileIndex != 0)
         {
-            Tile nTile;
-            tileDict.TryGetValue(west._WorldPos + new Vector3(-1, 0, 0),
-                out nTile);
-            if (nTile != null)
+            if (node._TileIndex == 3)
             {
-                if (!nTile.BlockedRight)
+                if (!node._ParentTile.BlockedLeft && !west._ParentTile.BlockedRight)
                 {
                     neighbours.Add(west);
                 }
@@ -116,6 +93,7 @@ public class Grid : Singleton<Grid>
             {
                 neighbours.Add(west);
             }
+            
         }
 
         return neighbours;
@@ -126,10 +104,10 @@ public class Grid : Singleton<Grid>
         return _Grid;
     }
 
-    public void AddToGrid(Vector3 worldPos)
+    public void AddToGrid(Vector3 worldPos, Tile tile, int tileIndex)
     {
         worldPos.y = 0;
-        Node node = new Node(true, worldPos);
+        Node node = new Node(worldPos, tile, tileIndex);
         _Grid.Add(worldPos, node);
     }
 
@@ -205,7 +183,7 @@ public class Grid : Singleton<Grid>
 
         foreach (var n in _Grid.Values)
         {
-            if (!_pathFinding.IsInGrid(n._WorldPos))
+            if (!_PathFinding.IsInGrid(n._WorldPos))
             {
                 Gizmos.color = Color.white;
                 Gizmos.DrawCube(n._WorldPos,

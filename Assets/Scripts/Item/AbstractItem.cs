@@ -6,8 +6,7 @@ using UnityEngine;
 public class AbstractItem : MonoBehaviour
 {
     public string itemName;
-    public bool isArtefact;
-    public bool isIdentified;
+    public bool isArtefact, isIdentified;
 
     [HideInInspector]
     public GameObject owner;

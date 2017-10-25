@@ -6,21 +6,21 @@ using UnityEngine;
 public class NaiveItemUse : MonoBehaviour
 {
     [SerializeField]
-    private List<AbstractItem> _inventory;
+    private List<AbstractItem> _Inventory;
 
 	// Use this for initialization
 	void Start ()
 	{
-	    _inventory = GetComponent<Inventory>().GetInventory();
+	    _Inventory = GetComponent<Inventory>().GetInventory();
 	}
 	
 	// Update is called once per frame
 	void Update ()
     {
-        List<AbstractItem> itemCopy = new List<AbstractItem>(_inventory);
+        List<AbstractItem> itemCopy = new List<AbstractItem>(_Inventory);
         foreach (var item in itemCopy)
         {
-            if (item != null && !item.isArtefact && _inventory.Contains(item))
+            if (item != null && !item.isArtefact && _Inventory.Contains(item))
             {
                 item.Use();
             }

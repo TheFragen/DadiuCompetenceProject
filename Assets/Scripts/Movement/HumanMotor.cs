@@ -8,23 +8,6 @@ public class HumanMotor : MonoBehaviour
     public delegate void PickupItem(AbstractItem item);
     public event PickupItem OnItemPickup;
 
-   // private bool _LevelIsGenerated;
-
-    private void OnEnable()
-    {
-        GameManager.OnLevelGenerated += SetLevel;
-    }
-
-    private void OnDisable()
-    {
-        GameManager.OnLevelGenerated -= SetLevel;
-    }
-
-    private void SetLevel()
-    {
-      //  _LevelIsGenerated = true;
-    }
-
     private void Start()
     {
         GameManager.Instance.CreatePlayer(gameObject);
@@ -54,6 +37,7 @@ public class HumanMotor : MonoBehaviour
             1,
             layerMask);
 
+        // Collision detection
         if (!raycastResult || (hit.transform != null && hit.transform.CompareTag("Item")))
         {
             if (GameManager.Instance.PerformAction(gameObject))
@@ -71,17 +55,16 @@ public class HumanMotor : MonoBehaviour
         {
             return origin;
         }
-        else
-        {
-            return Vector3.MoveTowards(origin, target, 1);
-        }
+        return Vector3.MoveTowards(origin, target, 1);
     }
 
     public void InvokeItemPickup(Collider collider)
     {
-        //   if (!_LevelIsGenerated) return;
-        AbstractItem _tmp = collider.gameObject.GetComponent<AbstractItem>();
-        if (_tmp == null) return;
+        AbstractItem itemToPickup = collider.gameObject.GetComponent<AbstractItem>();
+        if (itemToPickup == null)
+        {
+            return;
+        }
 
         Debug.DrawLine(transform.position, collider.transform.position, Color.yellow);
 
@@ -89,7 +72,7 @@ public class HumanMotor : MonoBehaviour
         {
             if (OnItemPickup != null)
             {
-                OnItemPickup.Invoke(_tmp);
+                OnItemPickup.Invoke(itemToPickup);
                 collider.gameObject.SetActive(false);
             }
         }

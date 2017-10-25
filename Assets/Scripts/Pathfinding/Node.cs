@@ -4,15 +4,17 @@
 public class Node
 {
     public Vector3 _WorldPos;
-    public bool _Walkable;
+    public Tile _ParentTile;
+    public int _TileIndex;
     public int _HCost = 0;
     public int _GCost = 0;
     public Node _parentNode;
 
-    public Node(bool walkable, Vector3 worldPos)
+    public Node(Vector3 worldPos, Tile tile, int tileIndex)
     {
         _WorldPos = worldPos;
-        _Walkable = walkable;
+        _ParentTile = tile;
+        _TileIndex = tileIndex;
     }
 
     public int FCost()

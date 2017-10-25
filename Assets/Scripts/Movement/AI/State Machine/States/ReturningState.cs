@@ -14,7 +14,7 @@ public class ReturningState : State
 
     public override void OnStateEnter()
     {
-        _path = _ai._PathFinding.GeneratePath(_ai.transform.position, new Vector3(-1,0,1));
+        _path = _ai._PathFinding.GeneratePath(_ai.transform.position, _ai._SpawnPosition);
     }
 
     public override void Tick()
@@ -23,14 +23,20 @@ public class ReturningState : State
         {
             _ai.SetState(new SearchingState(_ai));
         }
-        if (!_isMoving && GameManager.Instance.IsPlayerTurn(_ai.gameObject)) {
+        if (!_isMoving && GameManager.Instance.IsPlayerTurn(_ai.gameObject))
+        {
             _ai.StartCoroutine(PerformMovement(_ai._WaitTime));
         }
     }
 
     IEnumerator PerformMovement(float delay) {
         _isMoving = true;
-       
+
+        if (delay > 0)
+        {
+            yield return new WaitForSeconds(delay);
+        }
+
         Vector3 targetPos = _path[_pathIndex]._WorldPos;
 
         targetPos.y = _ai.transform.position.y;

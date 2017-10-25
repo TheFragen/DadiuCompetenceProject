@@ -10,6 +10,6 @@ public class IdleState : State {
 
     public override void Tick()
     {
-        _ai.transform.Rotate(new Vector3(0,30,0));
+        _ai.transform.Rotate(new Vector3(0,5,0));
     }
 }

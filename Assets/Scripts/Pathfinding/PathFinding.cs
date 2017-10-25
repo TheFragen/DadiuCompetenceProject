@@ -10,12 +10,15 @@ public class PathFinding : MonoBehaviour
 {
     [SerializeField]
     private Grid _Grid;
-
     private bool _LevelIsGenerated;
 
     [SerializeField]
     private Items _itemScriptableObject;
     private Dictionary<GameObject, List<Node>> _PathsActive = new Dictionary<GameObject, List<Node>>();
+
+    [SerializeField]
+    private List<Vector3> _tempTargets;
+    private Vector3 _tempTarget;
 
     private void OnEnable()
     {
@@ -58,17 +61,14 @@ public class PathFinding : MonoBehaviour
     public List<Node> GeneratePath(Vector3 start, Vector3 target)
     {
         List<Node> path = new List<Node>();
-
         float startTime = Time.realtimeSinceStartup;
 
-        if (!_LevelIsGenerated)
-        {
+        if (!_LevelIsGenerated) {
             Debug.LogError("No level generated yet");
             return null;
         }
         SimplePriorityQueue<Node> open = new SimplePriorityQueue<Node>();
         HashSet<Node> closed = new HashSet<Node>();
-
 
         Node startNode = _Grid.WorldPosToNode(start);
         Node targetNode = _Grid.WorldPosToNode(target);
@@ -80,17 +80,13 @@ public class PathFinding : MonoBehaviour
             print("TargetNode is null");
             Debug.LogError("TargetNode is null");
         }
-        print("Creating path");
         if (startNode == null || targetNode == null) {
             return null;
         }
-        open.Enqueue(startNode, 0);
-        Node currentNode;
-        open.TryFirst(out currentNode);
 
-        while (open.Count > 0)
-        {
-            currentNode = open.OrderBy(n => n.FCost()).First();
+        open.Enqueue(startNode, startNode.FCost());
+        while (open.Count > 0) {
+            Node currentNode = open.Dequeue();
 
             // Return if a path is found
             if (currentNode == targetNode) {
@@ -98,36 +94,25 @@ public class PathFinding : MonoBehaviour
                 //print("<color=green>Pathfinding:</color> Time of execution: " + (Time.realtimeSinceStartup - startTime));
                 return path;
             }
-            open.Remove(currentNode);
 
             // Add current to closed
             closed.Add(currentNode);
 
             foreach (var neighbour in _Grid.GetNeighbours(currentNode)) {
-                if (!neighbour._Walkable || closed.Contains(neighbour)) {
-                    continue;
-                }
 
+                // Distance to startNode through parent
                 int newCost = currentNode._GCost + ManhattenDistanceInt(currentNode, neighbour);
-                if (open.Contains(neighbour) && newCost < neighbour._GCost)
+                if (!closed.Contains(neighbour) || newCost < neighbour._GCost)
                 {
-                    open.Remove(neighbour);
-                }
-                if (closed.Contains(neighbour) && newCost < neighbour._GCost)
-                {
-                    closed.Remove(neighbour);
-                }
-                if (!open.Contains(neighbour) && !closed.Contains(neighbour))
-                {
-                    // Distance to startNode through parent
                     neighbour._GCost = newCost;
+                    neighbour._HCost = ManhattenDistanceInt(neighbour, targetNode);
                     open.Enqueue(neighbour, neighbour.FCost());
                     neighbour._parentNode = currentNode;
+                    closed.Add(neighbour);
                 }
             }
         }
 
-        print("Out returning: " +path.Count);
         return path;
     }
 
@@ -162,6 +147,26 @@ public class PathFinding : MonoBehaviour
     
     private void OnDrawGizmos()
     {
+        if (_tempTargets != null &&_tempTargets.Count > 0)
+        {
+            Gizmos.color = Color.yellow;
+            for (int i = 0; i < _tempTargets.Count; i++)
+            {
+                Vector3 node = _tempTargets[i];
+                if (i == _tempTargets.Count - 1)
+                {
+                    Gizmos.color = Color.red;
+                    Gizmos.DrawCube(node, Vector3.one * (_itemScriptableObject._nodeDiameter - .1f));
+                }
+                else
+                {
+                    Gizmos.DrawCube(node, Vector3.one * (_itemScriptableObject._nodeDiameter - .1f));
+                }
+                
+            }
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawCube(_tempTarget, Vector3.one * (_itemScriptableObject._nodeDiameter - .1f));
+        }
         if (_PathsActive == null || _PathsActive.Count == 0)
         {
             return;

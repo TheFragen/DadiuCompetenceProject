@@ -7,6 +7,10 @@ public class Identification : AbstractItem
     public override void Use()
     {
         base.Use();
-        JuiceController.Instance.SelectPlayer(owner);
+        if(owner.tag == "Player")
+        {
+            JuiceController.Instance.SelectPlayer(owner);
+        }
+        
     }
 }

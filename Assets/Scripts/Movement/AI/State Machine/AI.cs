@@ -1,13 +1,18 @@
 ﻿using System.Collections.Generic;
 using Gamelogic.Extensions;
+using JetBrains.Annotations;
 using UnityEngine;
 
-// TODO: Make state machine generic
 public class AI : MonoBehaviour
 {
     public PathFinding _PathFinding;
+    public Vector3 _SpawnPosition;
     public float _WaitTime;
-    [SerializeField, ReadOnly]
+
+    // Test case - Can be used to set the AI to never return to home, even if the artefact is found
+    public bool _ContiniouslySearchAndMove;
+
+    [SerializeField, ReadOnly, UsedImplicitly]
     private string _currentStateLiteral;
     [HideInInspector]
     public HumanMotor _HumanMotor;

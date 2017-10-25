@@ -11,7 +11,6 @@ public class AnimationEventProxy : MonoBehaviour
     [SerializeField]
     private GameObject FightCanvas;
     private AudioSource _as;
-    
 
     void Start()
     {

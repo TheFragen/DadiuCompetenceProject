@@ -30,7 +30,6 @@ public class SearchingState : State
 
     private GameObject FindClosestItem()
     {
-        // Todo: Search first by euclidian distance, then filter by Path distance
         var spawnedItems = GameManager.Instance.GetSpawnedItems()
             .Where(o => o.gameObject.activeInHierarchy)
             .Where(o => !_ai._BlacklsitedNodes.Contains(o.gameObject))
