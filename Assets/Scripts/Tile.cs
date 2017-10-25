@@ -16,7 +16,7 @@ public class Tile : MonoBehaviour
     [SerializeField]
     private Items _itemScriptableObject;
     [SerializeField]
-    private bool disableItemSpawn;
+    private bool _disableItemSpawn, _startHidden;
 
     private List<Vector3> _itemSpawnPositions;
     private Grid _Grid;
@@ -29,19 +29,19 @@ public class Tile : MonoBehaviour
         _itemSpawnPositions = GetTilePositions();
 
         int numItemsToSpawn = Random.Range(0, 9);
-        if (!disableItemSpawn)
+        if (!_disableItemSpawn)
         {
             for (int i = 0; i < numItemsToSpawn; i++)
             {
                 SpawnObjects(ref _itemSpawnPositions);
             }
         }
-        if (gameObject.tag != "Respawn")
+        if (gameObject.tag != "Respawn" && _startHidden)
         {
             foreach (var rend in gameObject
                 .GetComponentsInChildren<Renderer>())
             {
-             //    rend.enabled = false;
+                rend.enabled = false;
             }
         }
     }

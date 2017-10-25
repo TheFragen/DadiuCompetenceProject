@@ -12,6 +12,11 @@ public class Grid : Singleton<Grid>
 
     private Dictionary<Vector3, Node> _Grid;
 
+    public Dictionary<Vector3, Node> GetGrid()
+    {
+        return _Grid;
+    }
+
     private void Awake()
     {
         _Grid = new Dictionary<Vector3, Node>();

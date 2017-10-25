@@ -18,7 +18,7 @@ public class CombatDetection : MonoBehaviour
         if (other.gameObject == _activeOpponent && dist > maxDistance &&
             _isShowingButton)
         {
-            JuiceController.Instance.DisableCombat();
+            FightController.Instance.CombatTerminate();
             _isShowingButton = false;
             _activeOpponent = null;
         }
@@ -26,7 +26,7 @@ public class CombatDetection : MonoBehaviour
                  dist < maxDistance &&
                  GameManager.Instance.IsPlayerTurn(gameObject))
         {
-            JuiceController.Instance.EnableCombat(gameObject, other.gameObject);
+            FightController.Instance.CombatInit(gameObject, other.gameObject);
             _isShowingButton = true;
             _activeOpponent = other.gameObject;
         }
@@ -35,7 +35,7 @@ public class CombatDetection : MonoBehaviour
     void OnTriggerExit(Collider other)
     {
         if (other.tag == "AI" || other.tag == "Player") {
-            JuiceController.Instance.DisableCombat();
+            FightController.Instance.CombatTerminate();
             _isShowingButton = false;
             _activeOpponent = null;
         }

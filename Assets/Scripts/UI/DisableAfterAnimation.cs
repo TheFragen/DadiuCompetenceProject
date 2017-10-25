@@ -12,8 +12,8 @@ public class DisableAfterAnimation : MonoBehaviour
         if (GetComponent<Animator>().enabled)
         {
             bool isEnemy = _animator.GetBool("IsEnemy");
-            JuiceController.Instance.SetupBattle(isEnemy);
-            JuiceController.Instance.CombatSubtract(isEnemy);
+            FightController.Instance.SetupBattleOptions(isEnemy);
+            FightController.Instance.CombatSubtract(isEnemy);
             gameObject.SetActive(false);
         }
         

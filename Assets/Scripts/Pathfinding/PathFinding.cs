@@ -16,10 +16,6 @@ public class PathFinding : MonoBehaviour
     private Items _itemScriptableObject;
     private Dictionary<GameObject, List<Node>> _PathsActive = new Dictionary<GameObject, List<Node>>();
 
-    [SerializeField]
-    private List<Vector3> _tempTargets;
-    private Vector3 _tempTarget;
-
     private void OnEnable()
     {
         GameManager.OnLevelGenerated += SetLevel;
@@ -147,26 +143,6 @@ public class PathFinding : MonoBehaviour
     
     private void OnDrawGizmos()
     {
-        if (_tempTargets != null &&_tempTargets.Count > 0)
-        {
-            Gizmos.color = Color.yellow;
-            for (int i = 0; i < _tempTargets.Count; i++)
-            {
-                Vector3 node = _tempTargets[i];
-                if (i == _tempTargets.Count - 1)
-                {
-                    Gizmos.color = Color.red;
-                    Gizmos.DrawCube(node, Vector3.one * (_itemScriptableObject._nodeDiameter - .1f));
-                }
-                else
-                {
-                    Gizmos.DrawCube(node, Vector3.one * (_itemScriptableObject._nodeDiameter - .1f));
-                }
-                
-            }
-            Gizmos.color = Color.cyan;
-            Gizmos.DrawCube(_tempTarget, Vector3.one * (_itemScriptableObject._nodeDiameter - .1f));
-        }
         if (_PathsActive == null || _PathsActive.Count == 0)
         {
             return;

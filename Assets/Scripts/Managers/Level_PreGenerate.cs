@@ -21,9 +21,6 @@ public class Level_PreGenerate : Singleton<Level_PreGenerate>
     private List<GameObject> _spawnedTiles;
 
     [SerializeField]
-    private GameObject[,] tiles;
-
-    [SerializeField]
     private Dictionary<Vector3, Tile> tileDict;
 
     private List<GameObject> possibleTilesUp;

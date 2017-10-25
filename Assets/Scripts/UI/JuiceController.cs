@@ -4,11 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Gamelogic.Extensions;
 using UnityEngine;
-using UnityEngine.Experimental.UIElements;
 using UnityEngine.UI;
 using Button = UnityEngine.UI.Button;
 using Image = UnityEngine.UI.Image;
-using Slider = UnityEngine.UI.Slider;
 
 public class JuiceController : Singleton<JuiceController>
 {
@@ -31,43 +29,27 @@ public class JuiceController : Singleton<JuiceController>
     [SerializeField]
     private Text ActionsLeftText;
 
-    #region CombatVars
-
     [Header("Combat")]
-    [SerializeField]
-    private Button StartCombatButton;
-    [SerializeField]
-    private GameObject FightCanvas;
-    [SerializeField]
-    private Animator FightCanvasAnimator;
-    [SerializeField]
-    private GameObject FightTextObject;
-    [SerializeField]
-    private List<string> FightText;
-    [SerializeField]
-    private List<GameObject> NonFightObjects;
-    [SerializeField]
-    private GameObject FightOptionsObject;
-    [SerializeField]
-    private Animator DiceAnimator;
-    [SerializeField]
-    private Slider PlayerHealthObject, OpponentHealthObject;
-    [SerializeField]
-    private GameObject _WinPanel;
-    [SerializeField]
-    private Vector3 _SpawnPostion;
+    [SerializeField, Tooltip("The GameObjects that wont be disabled or enabled once combat is entered or terminated.")]
+    private List<GameObject> ObjectsToIgnore;
 
-    private int enemyLives;
-    private int playerLives;
-    private GameObject combatPlayer;
-    private GameObject combatOpponent;
-    private bool InCombat;
+    private List<Transform> objectsToHide;
 
-    #endregion
-
-    void Start()
+    private void OnEnable()
     {
-        FightCanvasAnimator = FightCanvas.GetComponent<Animator>();
+        FightController.OnCombatStarted += CombatStart;
+        FightController.OnCombatEnded += CombatEnd;
+    }
+
+    private void OnDisable()
+    {
+        FightController.OnCombatStarted -= CombatStart;
+        FightController.OnCombatEnded -= CombatEnd;
+    }
+
+    private void Start()
+    {
+        objectsToHide = transform.GetChildren().Where(o => !ObjectsToIgnore.Contains(o.gameObject)).ToList();
     }
 
     public void SetEndTurnButton(GameObject player)
@@ -179,8 +161,8 @@ public class JuiceController : Singleton<JuiceController>
             t.horizontalOverflow = HorizontalWrapMode.Overflow;
 
             tmp.AddComponent<VerticalLayoutGroup>();
-            img.transform.SetParent(tmp.transform);
-            txt.transform.SetParent(tmp.transform);
+            img.transform.SetParent(tmp.transform, false);
+            txt.transform.SetParent(tmp.transform, false);
 
             Button btn = tmp.AddComponent<Button>();
             btn.targetGraphic = img.GetComponent<Image>();
@@ -191,7 +173,7 @@ public class JuiceController : Singleton<JuiceController>
                     RevealArtefact(op);
                 });
             }
-            tmp.transform.SetParent(ChoosePlayerPanel.transform);
+            tmp.transform.SetParent(ChoosePlayerPanel.transform, false);
         }
     }
 
@@ -224,8 +206,8 @@ public class JuiceController : Singleton<JuiceController>
                 t.alignment = TextAnchor.UpperCenter;
 
                 tmp.AddComponent<VerticalLayoutGroup>();
-                img.transform.SetParent(tmp.transform);
-                txt.transform.SetParent(tmp.transform);
+                img.transform.SetParent(tmp.transform, false);
+                txt.transform.SetParent(tmp.transform, false);
 
                 Button btn = tmp.AddComponent<Button>();
                 btn.targetGraphic = img.GetComponent<Image>();
@@ -236,7 +218,7 @@ public class JuiceController : Singleton<JuiceController>
                     AnnounceArtefact(item, s);
                     ChoosePlayerPanel.transform.parent.gameObject.SetActive(false);
                 });
-                tmp.transform.SetParent(ChoosePlayerPanel.transform);
+                tmp.transform.SetParent(ChoosePlayerPanel.transform, false);
             }
         }
         else
@@ -256,189 +238,20 @@ public class JuiceController : Singleton<JuiceController>
         ActionsLeftText.text = actions +" actions left";
     }
 
-    #region Combat
-
-    public void EnableCombat(GameObject player, GameObject opponent) {
-        StartCombatButton.onClick.RemoveAllListeners();
-        StartCombatButton.gameObject.SetActive(true);
-        StartCombatButton.onClick.AddListener(delegate
-        {
-            StartCombat(player, opponent);
-        });
-    }
-
-    public void DisableCombat() {
-        StartCombatButton.onClick.RemoveAllListeners();
-        StartCombatButton.gameObject.SetActive(false);
-        EndCombat(true);
-    }
-
-    public void StartCombat(GameObject player, GameObject opponent) {
-        print(player.name + " wants to fight " + opponent.name);
-        combatPlayer = player;
-        combatOpponent = opponent;
-        InCombat = true;
-
-        _WinPanel.SetActive(false);
-        FightCanvasAnimator.enabled = true;
-        FightCanvas.SetActive(true);
-        StartCombatButton.gameObject.SetActive(false);
-        FightTextObject.GetComponent<ScrollingText>().SetText(FightText,
-            delegate
-            {
-                SetupBattle(true);
-            });
-        SetStateOnList(NonFightObjects, false);
-        DiceAnimator.gameObject.SetActive(false);
-
-        DiceAnimator.enabled = true;
-        DiceAnimator.gameObject.GetComponent<Image>().enabled = true;
-
-        enemyLives = 10;
-        playerLives = 10;
-        StartCoroutine(CombatUpdate());
-    }
-
-    public void SetupBattle(bool optionsState)
+    private void CombatStart()
     {
-        FightOptionsObject.SetActive(optionsState);
-        DiceAnimator.SetBool("IsEnemy", false);
+        foreach (var child in objectsToHide)
+        {
+            child.gameObject.SetActive(false);
+        }
     }
 
-    IEnumerator EnemyCombatTurn()
+    private void CombatEnd()
     {
-        yield return new WaitForSeconds(2);
-        ThrowDice(1);
-    }
-
-    IEnumerator CombatUpdate()
-    {
-        while (true)
+        foreach (var child in objectsToHide)
         {
-            PlayerHealthObject.value = playerLives;
-            OpponentHealthObject.value = enemyLives;
-
-            if (enemyLives <= 0)
-            {
-                EndCombatWithText();
-                break;
-            }
-            if (playerLives <= 0)
-            {
-                EndCombatWithText();
-                break;
-            }
-            yield return new WaitForEndOfFrame();
+            child.gameObject.SetActive(true);
         }
     }
-
-    public void CombatSubtract(bool isEnemy)
-    {
-        //isEnemy is the caller
-        if (isEnemy)
-        {
-            playerLives -= Math.Max(UnityEngine.Random.Range(1, 7), 0);
-        }
-        else
-        {
-            enemyLives -= Math.Max(UnityEngine.Random.Range(1, 7), 0);
-        }
-
-        if (enemyLives < 4 && enemyLives > 0) {
-            FightCanvasAnimator.SetTrigger("EnemyBlink");
-        }
-        if (playerLives < 4 && playerLives > 0) {
-            FightCanvasAnimator.SetTrigger("PlayerBlink");
-        }
-    }
-
-    public void ThrowDice(int playerNum) {
-        FightOptionsObject.SetActive(false);
-        DiceAnimator.gameObject.SetActive(true);
-        if (playerNum == 0)
-        {
-            DiceAnimator.SetTrigger("PlayerDice");
-            FightCanvasAnimator.SetTrigger("EnemyDamage");
-            StartCoroutine(EnemyCombatTurn());
-            FightOptionsObject.SetActive(false);
-        }
-        else
-        {
-            DiceAnimator.SetTrigger("EnemyDice");
-            DiceAnimator.SetBool("IsEnemy", true);
-            FightCanvasAnimator.SetTrigger("PlayerDamage");
-            
-        }
-        
-    }
-
-    private void EndCombatWithText()
-    {
-        StopCoroutine(CombatUpdate());
-        DiceAnimator.enabled = false;
-        DiceAnimator.StopPlayback();
-        DiceAnimator.gameObject.SetActive(false);
-        DiceAnimator.gameObject.GetComponent<Image>().enabled = false;
-        FightCanvasAnimator.enabled = false;
-        FightOptionsObject.SetActive(false);
-
-        // Play sound
-
-        List<string> endText = new List<string>();
-        if (playerLives <= 0)
-        {
-            endText.Add("The opponent has won the fight.");
-            endText.Add(
-                "You have been returned to Tristam, and lost all your items.");
-        }
-        else if (enemyLives <= 0)
-        {
-            endText.Add("Congratulations, you've won the fight.");
-            endText.Add("Your opponent has been stripped of his items and cast back to Tristam.");
-        }
-        FightTextObject.GetComponent<ScrollingText>().SetText(endText,
-            delegate { EndCombat(false); });
-    }
-
-    public void EndCombat(bool isRunning)
-    {
-        // Simply just reset the combat state
-        if (combatPlayer == null && !InCombat)
-        {
-            FightCanvas.SetActive(false);
-            return;
-        }
-
-        StopCoroutine(CombatUpdate());
-        _WinPanel.SetActive(true);
-        DiceAnimator.gameObject.SetActive(false);
-
-        if (!isRunning) {
-            if (playerLives <= 0) {
-                GameManager.instance.RemoveAllItems(combatPlayer);
-                combatPlayer.transform.position = _SpawnPostion;
-            }
-            if (enemyLives <= 0) {
-                GameManager.instance.RemoveAllItems(combatOpponent);
-                combatOpponent.transform.position = _SpawnPostion;
-                AI ai = combatOpponent.GetComponent<AI>();
-                ai.SetState(new SearchingState(ai));
-            }
-        }
-        
-        GameManager.Instance.NextTurn(combatPlayer);
-        combatPlayer = null;
-        combatOpponent = null;
-        SetStateOnList(NonFightObjects, true);
-        InCombat = false;
-    }
-
-    private void SetStateOnList(List<GameObject> list, bool state) {
-        foreach (var o in list) {
-            o.SetActive(state);
-        }
-    }
-
-    #endregion
 
 }

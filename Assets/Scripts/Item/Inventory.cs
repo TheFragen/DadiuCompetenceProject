@@ -93,7 +93,7 @@ public class Inventory : MonoBehaviour
         tmpButton.GetComponent<Button>().onClick.AddListener(item.Use);
         tmpButton.GetComponent<Image>().sprite = item.sprite;
         tmpButton.name = item.itemName;
-        tmpButton.transform.SetParent(_canvasPanel.transform);
+        tmpButton.transform.SetParent(_canvasPanel.transform, false);
         itemButtonDictionary.Add(item, tmpButton);
     }
 
