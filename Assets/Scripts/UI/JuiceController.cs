@@ -8,6 +8,7 @@ using UnityEngine.Experimental.UIElements;
 using UnityEngine.UI;
 using Button = UnityEngine.UI.Button;
 using Image = UnityEngine.UI.Image;
+using Slider = UnityEngine.UI.Slider;
 
 public class JuiceController : Singleton<JuiceController>
 {
@@ -50,7 +51,7 @@ public class JuiceController : Singleton<JuiceController>
     [SerializeField]
     private Animator DiceAnimator;
     [SerializeField]
-    private Text PlayerHealthObject, OpponentHealthObject;
+    private Slider PlayerHealthObject, OpponentHealthObject;
     [SerializeField]
     private GameObject _WinPanel;
     [SerializeField]
@@ -314,8 +315,8 @@ public class JuiceController : Singleton<JuiceController>
     {
         while (true)
         {
-            PlayerHealthObject.text = "Health: " + playerLives;
-            OpponentHealthObject.text = "Health: " + enemyLives;
+            PlayerHealthObject.value = playerLives;
+            OpponentHealthObject.value = enemyLives;
 
             if (enemyLives <= 0)
             {
@@ -336,16 +337,22 @@ public class JuiceController : Singleton<JuiceController>
         //isEnemy is the caller
         if (isEnemy)
         {
-            playerLives -= UnityEngine.Random.Range(1, 7);
+            playerLives -= Math.Max(UnityEngine.Random.Range(1, 7), 0);
         }
         else
         {
-            enemyLives -= UnityEngine.Random.Range(1, 7);
+            enemyLives -= Math.Max(UnityEngine.Random.Range(1, 7), 0);
+        }
+
+        if (enemyLives < 4 && enemyLives > 0) {
+            FightCanvasAnimator.SetTrigger("EnemyBlink");
+        }
+        if (playerLives < 4 && playerLives > 0) {
+            FightCanvasAnimator.SetTrigger("PlayerBlink");
         }
     }
 
     public void ThrowDice(int playerNum) {
-        print("I threw a dice: " +playerNum);
         FightOptionsObject.SetActive(false);
         DiceAnimator.gameObject.SetActive(true);
         if (playerNum == 0)
@@ -389,7 +396,6 @@ public class JuiceController : Singleton<JuiceController>
             endText.Add("Congratulations, you've won the fight.");
             endText.Add("Your opponent has been stripped of his items and cast back to Tristam.");
         }
-        List<string> endTextList = new List<string>();
         FightTextObject.GetComponent<ScrollingText>().SetText(endText,
             delegate { EndCombat(false); });
     }
@@ -409,12 +415,10 @@ public class JuiceController : Singleton<JuiceController>
 
         if (!isRunning) {
             if (playerLives <= 0) {
-                print("Reset player position");
                 GameManager.instance.RemoveAllItems(combatPlayer);
                 combatPlayer.transform.position = _SpawnPostion;
             }
             if (enemyLives <= 0) {
-                print("Reset enemy position");
                 GameManager.instance.RemoveAllItems(combatOpponent);
                 combatOpponent.transform.position = _SpawnPostion;
                 AI ai = combatOpponent.GetComponent<AI>();

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using EasyButtons;
+using Priority_Queue;
 using UnityEngine;
 
 public class PathFinding : MonoBehaviour
@@ -64,7 +66,7 @@ public class PathFinding : MonoBehaviour
             Debug.LogError("No level generated yet");
             return null;
         }
-        List<Node> open = new List<Node>();
+        SimplePriorityQueue<Node> open = new SimplePriorityQueue<Node>();
         HashSet<Node> closed = new HashSet<Node>();
 
 
@@ -82,30 +84,24 @@ public class PathFinding : MonoBehaviour
         if (startNode == null || targetNode == null) {
             return null;
         }
-        open.Add(startNode);
-        
-        while (open.Count > 0) {
-            Node currentNode = open[0];
-            // Find lowest fCost node in open
-            foreach (var n in open) {
-                if (n.FCost() <= currentNode.FCost() &&
-                    n._HCost < currentNode._HCost) {
-                    currentNode = n;
-                }
-            }
+        open.Enqueue(startNode, 0);
+        Node currentNode;
+        open.TryFirst(out currentNode);
 
-            // Remove current from open
-            open.Remove(currentNode);
-            closed.Add(currentNode);
+        while (open.Count > 0)
+        {
+            currentNode = open.OrderBy(n => n.FCost()).First();
 
             // Return if a path is found
             if (currentNode == targetNode) {
-                //print("Found the path dude");
                 path = Retrace(startNode, targetNode);
-                print("In returning: " + path.Count);
                 //print("<color=green>Pathfinding:</color> Time of execution: " + (Time.realtimeSinceStartup - startTime));
                 return path;
             }
+            open.Remove(currentNode);
+
+            // Add current to closed
+            closed.Add(currentNode);
 
             foreach (var neighbour in _Grid.GetNeighbours(currentNode)) {
                 if (!neighbour._Walkable || closed.Contains(neighbour)) {
@@ -113,57 +109,26 @@ public class PathFinding : MonoBehaviour
                 }
 
                 int newCost = currentNode._GCost + ManhattenDistanceInt(currentNode, neighbour);
-                if (newCost < neighbour._GCost || !open.Contains(neighbour)) {
+                if (open.Contains(neighbour) && newCost < neighbour._GCost)
+                {
+                    open.Remove(neighbour);
+                }
+                if (closed.Contains(neighbour) && newCost < neighbour._GCost)
+                {
+                    closed.Remove(neighbour);
+                }
+                if (!open.Contains(neighbour) && !closed.Contains(neighbour))
+                {
                     // Distance to startNode through parent
                     neighbour._GCost = newCost;
-
-                    // Distance to target
-                    neighbour._HCost =
-                        ManhattenDistanceInt(neighbour, targetNode);
-
+                    open.Enqueue(neighbour, neighbour.FCost());
                     neighbour._parentNode = currentNode;
-
-                    if (!open.Contains(neighbour)) {
-                        open.Add(neighbour);
-                    }
                 }
             }
         }
+
         print("Out returning: " +path.Count);
         return path;
-    }
-    
-    IEnumerator FindPathCoroutine(float WaitTime)
-    {
-        yield return null;
-
-        /*
-        OPEN //the set of nodes to be evaluated
-            CLOSED //the set of nodes already evaluated
-        add the start node to OPEN
-
-
-        loop
-            current = node in OPEN with the lowest f_cost
-            remove current from OPEN
-            add current to CLOSED
-
-
-            if current is the target node //path has been found
-                return
-
-
-            foreach neighbour of the current node
-                if neighbour is not traversable or neighbour is in CLOSED
-                    skip to the next neighbour
-
-
-                if new path to neighbour is shorter OR neighbour is not in OPEN
-                    set f_cost of neighbour
-                    set parent of neighbour to current
-                    if neighbour is not in OPEN
-                        add neighbour to OPEN
-        */
     }
 
     float ManhattenDistance(Node s, Node e)
@@ -197,7 +162,6 @@ public class PathFinding : MonoBehaviour
     
     private void OnDrawGizmos()
     {
-
         if (_PathsActive == null || _PathsActive.Count == 0)
         {
             return;

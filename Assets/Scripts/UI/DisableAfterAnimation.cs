@@ -13,7 +13,6 @@ public class DisableAfterAnimation : MonoBehaviour
     {
         if (GetComponent<Animator>().enabled)
         {
-            print("Subtracting");
             bool isEnemy = _animator.GetBool("IsEnemy");
             JuiceController.Instance.SetupBattle(isEnemy);
             JuiceController.Instance.CombatSubtract(isEnemy);
