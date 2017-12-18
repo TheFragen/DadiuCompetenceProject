@@ -1,6 +1,6 @@
 exclude:
 - /Assets/Editor/CreateScriptableObject.cs
 - /Assets/Plugins/.*
-component_depth: 1
+component_depth: 3
 languages:
 - csharp
