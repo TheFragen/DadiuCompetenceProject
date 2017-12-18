@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Gamelogic.Extensions;
 using UnityEngine;
@@ -17,9 +18,14 @@ public class Grid : Singleton<Grid>
         return _Grid;
     }
 
+    public void ClearGrid()
+    {
+        _Grid.Clear();
+    }
+
     private void Awake()
     {
-        _Grid = new Dictionary<Vector3, Node>();
+        _Grid = new Dictionary<Vector3, Node>(_customComparer);
     }
 
     public List<Node> GetNeighbours(Node node)
@@ -115,10 +121,18 @@ public class Grid : Singleton<Grid>
         Node node = new Node(worldPos, tile, tileIndex);
         _Grid.Add(worldPos, node);
     }
+    public static Vector3CoordComparer _customComparer = new Vector3CoordComparer();
 
     public Node WorldPosToNode(Vector3 worldPos)
     {
         worldPos.y = 0;
+        Node n;
+        _Grid.TryGetValue(worldPos, out n);
+        // No node found, find the closest node to this position
+        if (n == null) {
+            Debug.Log("No node at pos: " +worldPos);
+            return FindClosestNode(worldPos, worldPos);
+        }
 
         Vector3 tilePos = Vector3.zero;
         // Get which Tile the position is on
@@ -141,7 +155,8 @@ public class Grid : Singleton<Grid>
         }
         else
         {
-            return FindClosestNode(worldPos);
+            Debug.Log("No MazeTile");
+            return FindClosestNode(worldPos, Vector3.positiveInfinity);
         }
         
         Vector3 normalizedPos = worldPos - tilePos;
@@ -151,18 +166,12 @@ public class Grid : Singleton<Grid>
         Vector3 nodePos = tilePos + normalizedPos;
         nodePos.y = 0;
 
-        Node n;
-        _Grid.TryGetValue(nodePos, out n);
-        // No node found, find the closest node to this position
-        if (n == null)
-        {
-            return FindClosestNode(worldPos);
-        }
+        
 
         return n;
     }
 
-    private Node FindClosestNode(Vector3 worldPos)
+    private Node FindClosestNode(Vector3 worldPos, Vector3 nodePos)
     {
         float minDist = Mathf.Infinity;
         Node closestNode = null;
@@ -191,9 +200,46 @@ public class Grid : Singleton<Grid>
             if (!_PathFinding.IsInGrid(n._WorldPos))
             {
                 Gizmos.color = Color.white;
-                Gizmos.DrawCube(n._WorldPos,
-                    Vector3.one * (_itemScriptableObject._nodeDiameter - .1f));
+             //   Gizmos.DrawCube(n._WorldPos, Vector3.one * (_itemScriptableObject._nodeDiameter - .1f));
+                
             }
+            drawString(n._WorldPos.ToString(), n._WorldPos, Color.black);
         }
+    }
+
+    static void drawString(string text, Vector3 worldPos, Color? colour = null) {
+        UnityEditor.Handles.BeginGUI();
+        if (colour.HasValue) GUI.color = colour.Value;
+        var view = UnityEditor.SceneView.currentDrawingSceneView;
+        Vector3 screenPos = view.camera.WorldToScreenPoint(worldPos);
+
+        if (screenPos.y < 0 || screenPos.y > Screen.height || screenPos.x < 0 || screenPos.x > Screen.width || screenPos.z < 0) {
+            UnityEditor.Handles.EndGUI();
+            return;
+        }
+
+        Vector2 size = GUI.skin.label.CalcSize(new GUIContent(text));
+        GUI.Label(new Rect(screenPos.x - (size.x / 2), -screenPos.y + view.position.height + 4, size.x, size.y), text);
+        UnityEditor.Handles.EndGUI();
+    }
+}
+
+public class Vector3CoordComparer : IEqualityComparer<Vector3>
+{
+    public bool Equals(Vector3 a, Vector3 b)
+    {
+        if (Mathf.Abs(a.x - b.x) > 0.001) return false;
+        if (Mathf.Abs(a.y - b.y) > 0.001) return false;
+        if (Mathf.Abs(a.z - b.z) > 0.001) return false;
+
+        return true; //indeed, very close
+    }
+
+    public int GetHashCode(Vector3 obj)
+    {
+        //a cruder than default comparison, allows to compare very close-vector3's into same hash-code.
+        return Math.Round(obj.x, 3).GetHashCode()
+               ^ Math.Round(obj.y, 3).GetHashCode() << 2
+               ^ Math.Round(obj.z, 3).GetHashCode() >> 2;
     }
 }

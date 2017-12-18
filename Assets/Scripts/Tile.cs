@@ -63,6 +63,7 @@ public class Tile : MonoBehaviour
                 Vector3 pos = transform.position;
                 pos.x = pos.x - width / 2 + x * xSpacing + xSpacing / 2;
                 pos.z = pos.z - height / 2 + y * ySpacing + ySpacing / 2;
+                pos.y = 0;
 
                 _Grid.AddToGrid(pos, this, tilePos);
                 spawnPositions.Add(pos);
@@ -76,7 +77,7 @@ public class Tile : MonoBehaviour
         List<AbstractItem> possibleItems = GameManager.Instance.GetItemList();
 
         int randomIndex = Random.Range(0, possibleItems.Count);
-        int spawnRate = _itemScriptableObject._spawnRate;
+        int spawnRate = _itemScriptableObject._spawnChance;
 
         bool shouldSpawn = Random.Range(0, 100) < spawnRate;
         if (shouldSpawn)

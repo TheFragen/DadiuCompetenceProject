@@ -49,8 +49,8 @@ public class TestUIAttackMove : MonoBehaviour
         yield return new WaitForSeconds(2);
         int nextEnemyHP = FightController.Instance.GetEnemyHealth();
 
-        Debug.Assert(nextEnemyHP < enemyHP);
+        bool testResult = nextEnemyHP < enemyHP;
 
-        Debug.Log(GetType().Name + " finished");
+        Debug.Log(GetType().Name + " " +(testResult ? "succeeded" : "failed"));
     }
 }

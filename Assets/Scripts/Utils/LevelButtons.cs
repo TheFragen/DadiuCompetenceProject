@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using EasyButtons;
-
 public class LevelButtons : MonoBehaviour
 {
     [Button]
@@ -19,5 +18,11 @@ public class LevelButtons : MonoBehaviour
     void RevealMap()
     {
         Level_PreGenerate.Instance.RevealMap();
+    }
+
+    [Button]
+    void ClearMap() {
+        Level_PreGenerate.Instance.ClearMap();
+        Grid.Instance.ClearGrid();
     }
 }

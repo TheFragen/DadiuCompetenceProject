@@ -119,6 +119,7 @@ public class GameManager : Singleton<GameManager>
         _players.Add(player);
     }
 
+    // TODO: Rename to check for action
     public bool PerformAction(GameObject player)
     {
         if (_turnHacks)
@@ -172,7 +173,7 @@ public class GameManager : Singleton<GameManager>
         {
             _turnIndex = 0;
         }
-        Camera.main.GetComponent<FollowPlayer>().SetPlayer(_players[_turnIndex]);
+        Camera.main.GetComponent<FollowPlayer>().SetPlayer(_players[_turnIndex]); // TODO: Cache main camera
         StartCoroutine(DelayTurn());
     }
 

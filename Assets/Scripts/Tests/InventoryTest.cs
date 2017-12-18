@@ -26,11 +26,10 @@ public class InventoryTest : MonoBehaviour
         Inventory playerInventory = Player.GetComponent<Inventory>();
         bool inventoryContainsItem = playerInventory.GetInventory().Count > 0;
         bool hasMoreThanZeroItems = InventoryCanvas.transform.childCount > 0;
+        
+        bool testResult = inventoryContainsItem && hasMoreThanZeroItems;
 
-        Debug.Assert(inventoryContainsItem);
-        Debug.Assert(hasMoreThanZeroItems);
-
-        Debug.Log(GetType().Name + " finished");
+        Debug.Log(GetType().Name + " " + (testResult ? "succeeded" : "failed"));
     }
 
 }

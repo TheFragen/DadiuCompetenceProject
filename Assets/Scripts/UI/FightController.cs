@@ -127,7 +127,7 @@ public class FightController : Singleton<FightController>
     public void CombatSubtract(bool isEnemy) {
         //isEnemy is the caller
         if (isEnemy) {
-            playerLives -= Math.Max(UnityEngine.Random.Range(1, 7), 0);
+            playerLives -= Math.Max(UnityEngine.Random.Range(1, 7), 0); // TODO: FIx this max usage
         }
         else {
             enemyLives -= Math.Max(UnityEngine.Random.Range(1, 7), 0);
@@ -178,20 +178,24 @@ public class FightController : Singleton<FightController>
         // Play sound
 
         List<string> endText = new List<string>();
-        if (playerLives <= 0) {
+        if (playerLives <= 0)
+        {
             endText.Add("The opponent has won the fight.");
             endText.Add(
                 "You have been returned to Tristam, and lost all your items.");
         }
-        else if (enemyLives <= 0) {
+        else if (enemyLives <= 0)
+        {
             endText.Add("Congratulations, you've won the fight.");
-            endText.Add("Your opponent has been stripped of his items and cast back to Tristam.");
+            endText.Add(
+                "Your opponent has been stripped of his items and cast back to Tristam.");
         }
         _fightTextObject.GetComponent<ScrollingText>().SetText(endText,
             delegate { EndCombat(false); });
     }
 
-    public void EndCombat(bool isRunning) {
+    public void EndCombat(bool isRunning)
+    {
         // Simply just reset the combat state
         if (combatPlayer == null && !InCombat)
         {
@@ -203,12 +207,15 @@ public class FightController : Singleton<FightController>
         _winPanel.SetActive(true);
         _diceAnimator.gameObject.SetActive(false);
 
-        if (!isRunning) {
-            if (playerLives <= 0) {
+        if (!isRunning)
+        {
+            if (playerLives <= 0)
+            {
                 GameManager.Instance.RemoveAllItems(combatPlayer);
                 combatPlayer.transform.position = _spawnPostion;
             }
-            if (enemyLives <= 0) {
+            if (enemyLives <= 0)
+            {
                 GameManager.Instance.RemoveAllItems(combatOpponent);
                 combatOpponent.transform.position = _spawnPostion;
                 AI ai = combatOpponent.GetComponent<AI>();

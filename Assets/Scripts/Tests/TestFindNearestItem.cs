@@ -22,7 +22,7 @@ public class TestFindNearestItem : MonoBehaviour
                     o.transform.position).Count)
             .Take(5).ToList();
 
-        Debug.Assert(spawnedItems.Count == 5);
-        Debug.Log(GetType().Name + " finished");
+        bool testResult = spawnedItems.Count == 5;
+        Debug.Log(GetType().Name + " " + (testResult ? "succeeded" : "failed"));
     }
 }

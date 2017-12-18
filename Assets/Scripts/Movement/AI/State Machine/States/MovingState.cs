@@ -17,7 +17,6 @@ public class MovingState : State
         _pathIndex = 0;
         GameObject target = _ai._ItemToLookFor;
         _path = _ai._PathFinding.GeneratePath(_ai.transform.position, target.transform.position);
-      //  Debug.Assert(_path != null && _path.Count > 0);
 
         if (_path != null && _path.Count > 0)
         {

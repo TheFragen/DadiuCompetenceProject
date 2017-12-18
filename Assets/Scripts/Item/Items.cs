@@ -9,7 +9,7 @@ public class Items : ScriptableObject
 	[Tooltip("Defines how often an item should be spawned." +
 	         " 0 is items will never spawn, 100 is items will always spawn"),
 	 Range(0, 100)]
-	public int _spawnRate;
+	public int _spawnChance;
 
     public float _nodeDiameter;
 }
